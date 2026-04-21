@@ -2,18 +2,18 @@ import bloodNeedModel from "../model/bloodNeedModel.js"
 
 export const bloodNeedController=async(req,res)=>{
       try {
-        const {name,phone,bloodGroup,hospital,address,createdBy,isAccepted,acceptedUser,isConfirmed}=req.body
-         if(!name || !phone || !bloodGroup || !hospital || !address || !createdBy){
+        const {name,phone,bloodGroup,hospital,email,address,createdBy,isAccepted,acceptedUser,isConfirmed}=req.body
+         if(!name || !phone || !bloodGroup || !hospital || !address || !email){
             return res.status(400).send({
                 success:false,
                 message:"All fields are Required"
             })
          }  
-        const existingNeed=await bloodNeedModel.findOne({phone})
+        const existingNeed=await bloodNeedModel.findOne({email})
         if(existingNeed){
             return res.status(200).send({
                 success:false,
-                message:"User can give Only one blood need at a time"
+                message:"User can give Only one blood need at a time with a email"
             })
         }
         
@@ -44,7 +44,7 @@ export const getBloodNeedController=async(req,res)=>{
     if( address) filter.address=address;
 
 
-    const bloodNeeds= await bloodNeedModel.find(filter).populate("name")
+    const bloodNeeds= await bloodNeedModel.find(filter)
     res.status(200).send({
         success:true,
         message:" All Blood needs are fetched",

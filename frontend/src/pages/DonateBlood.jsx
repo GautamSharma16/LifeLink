@@ -43,7 +43,7 @@ const DonateBlood = () => {
  
     const {data}= await axios.get('http://localhost:8080/api/v1/blood/get-blood-needs');
     
-    setBloodData(data.bloodNeeds.filter(item => item.isConfirmed ==false));
+    setBloodData(data.bloodNeeds.filter(item => item.isConfirmed ==false).filter(item=>item.isAccepted==false));
     
    
   }
@@ -52,7 +52,7 @@ const DonateBlood = () => {
   
   var user = JSON.parse(localStorage.getItem('token'));
    const id = user.existingUser._id
-
+   const email=user.existingUser.email
 const handelAccept=async(pId)=>{
        try {
        
@@ -64,7 +64,7 @@ const handelAccept=async(pId)=>{
        if(res.data.bloodNeed.createdBy === id){
         return alert("Can't Accept your Own Blood Need")
        }
-       if(res.data.bloodNeed.isAccepted === true){
+       if(res.data.bloodNeed.isAccepted === true){  
           return(window.location.reload() 
           && alert("Someone has already Accepted the need")
           )
@@ -74,7 +74,7 @@ const handelAccept=async(pId)=>{
         
         const payload={isAccepted:true,acceptedUser:id}
         const { data } = await axios.put(`http://localhost:8080/api/v1/blood/update-accepted/${pId}`,payload);
-
+          
         if(data.success){
           alert(data.message)
           navigate('/profile')
@@ -82,7 +82,8 @@ const handelAccept=async(pId)=>{
         else{
           alert(data.message)
         }
-
+        const payload1={mailTo:email,sendText:"Thanks For accepting the Blood Need"}
+        await axios.post(`http://localhost:8080/api/v1/mail/send-mail`,payload1)
 
        } catch (error) {
         console.log(error)
@@ -93,7 +94,36 @@ const removeFilter=()=>{
   alert('Filter Removed')
   window.location.reload()
 }
-
+const blood=(bloodG)=>{
+  let b=''
+      switch(bloodG){
+        case 'AP':
+            b= 'A+';
+            break;
+        case 'AN':
+            b= 'A-';
+            break;
+        case 'BP':
+            b= 'B+';
+            break;
+        case 'BN':
+            b= 'B-';
+            break;
+        case 'ABP':
+            b= 'AB+';
+            break;
+        case 'ABN':
+            b= 'AB-';
+            break;
+        case 'OP':
+            b= 'O+';
+            break;
+        case 'ON':
+            b= 'O-';
+            break;
+      }
+      return b;
+}
   useEffect(()=>{
     getBloodNeeds();
 
@@ -103,7 +133,7 @@ const removeFilter=()=>{
   return (
     <div>
         <Navbar/>
-        <h2>Donate Blood</h2>
+        <div className='dB'>Donate Blood</div>
         <div className="filter">
         <input type="text" className='input' placeholder='Address' value={address} onChange={(e)=>setAddress(e.target.value)}/>
         <select className='bloodGroup' value={bloodGroup} onChange={(e)=>setBloodGroup(e.target.value)}>
@@ -128,9 +158,10 @@ const removeFilter=()=>{
          
           <div className={ p.createdBy==id ?"bloodCard green":" bloodCard "} key={index} >
            
-           <div className='bGroup' > <div> BloodGroup:</div> <div> {p.bloodGroup}
+           <div className='bGroup' > <div> BloodGroup:</div> <div> {blood(p.bloodGroup)}
            </div> </div>
            <div className='bName' > <div>Name:</div> <div>{p.name}</div>  </div>
+           <div className='bEmail' > <div>Email:</div> <div>{p.email}</div>  </div>
            <div className='bMobile' > <div> Mobile No.:</div> <div>{p.phone}</div> </div>
            <div className='bHospital' > <div>Hospital:</div> <div>{p.hospital}</div>  </div>
            <div className='bAddress' ><div>Address:</div> <div>{p.address}</div>  </div>

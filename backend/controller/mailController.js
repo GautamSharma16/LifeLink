@@ -34,7 +34,7 @@ export const sendMailController=async(req,res)=>{
             error: error.message
         });
     }
-    console.log("success",res)
+  
    } catch (error) {
     console.log(error)
     res.status(400).send({

@@ -9,6 +9,10 @@ const bloodNeedSchema= mongoose.Schema({
         type:String,
         required:[true,"Phone is required"]
       },
+      email:{
+        type:String,
+        required:[true,"Email is required"]
+      },
       hospital:{
         type:String,
         required:[true,"Hospital is required"]
@@ -36,6 +40,6 @@ const bloodNeedSchema= mongoose.Schema({
         type:mongoose.ObjectId ,
         ref:"users",
       }
-})
+},{timestamps:true})
 
 export default mongoose.model('bloodNeeds',bloodNeedSchema)

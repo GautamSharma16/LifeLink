@@ -26,6 +26,6 @@ const userSchema= mongoose.Schema({
         required:[true,"Blood Group is required"],
         enum:['AP','AN','BP','BN','OP','ON','ABP','ABN']
      }
-},{timeStamp:true})
+},{timestamps:true})
 
 export default mongoose.model('users',userSchema)

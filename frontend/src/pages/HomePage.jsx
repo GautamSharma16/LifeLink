@@ -50,6 +50,42 @@ const HomePage = () => {
         <img src="https://img.freepik.com/free-vector/hand-drawn-world-blood-donor-day-illustration_23-2148942371.jpg?t=st=1713438819~exp=1713442419~hmac=d27c9c4c13ff5a41ffe88314adffba7538089304f980e9cff6b2c05cc064b801&w=996" alt="" />
       </div>
      </div>
+
+
+
+
+{/* second */}
+     <div className="aboutHead">Some Points About Blood Donation</div>
+     <div className="aboutBox">
+     <div className="pointsImg">
+        <img src="https://img.freepik.com/free-vector/flat-world-blood-donor-day-illustration_23-2149386191.jpg?t=st=1717393412~exp=1717397012~hmac=3a89c432c7509e2b9516093cc5800b4afbbdb8ac25534037c503dbb0a58b0c62&w=996" alt="" />
+      </div>
+      <div className="aboutText">
+
+    
+      <div className="first">
+        <div className="heading">Who can Donate To Whom?</div>
+        <div className="data">
+        <li>O-: Can donate to all blood types (A+, A-, B+, B-, AB+, AB-, O+, O-). </li>
+         <li> O+: Can donate to any Rh-positive blood types (A+, B+, AB+, O+).</li>
+         <li>A-: Can donate to A+/- and AB+/-.</li>
+          <li>A+: Can donate to A+ and AB+.</li>
+          <li>B-: Can donate to B+/- and AB+/-.</li>
+          <li>B+: Can donate to B+ and AB+</li>
+          <li>AB-: Can donate to AB+/-</li>
+          <li>AB+: Can donate to AB+ only. Universal recipient.</li>
+        </div>
+      </div>
+      
+      <div className="first">
+        <div className="heading"> Donation</div>
+        <div className="data">
+        Before donating blood, stay hydrated, eat a healthy meal, rest well, wear comfortable clothing, avoid alcohol and certain medications, and bring identification. After donating, rest, hydrate, snack, avoid heavy exercise, monitor for reactions, and eat iron-rich foods.
+        </div>
+      </div>
+      </div>
+      
+     </div>
     </>
   )
 }

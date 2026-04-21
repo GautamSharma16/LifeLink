@@ -1,24 +1,19 @@
 import express from "express";
-import { bloodNeedController, deleteBloodNeedController, getBloodNeedController, getSingleBloodController, needAcceptedController, needConfirmedController } from "../controller/bloodController.js";
+import {
+  acceptBloodRequest,
+  bloodRequestValidation,
+  completeBloodRequest,
+  createBloodRequest,
+  getBloodRequests,
+} from "../controllers/bloodController.js";
+import { authorize, protect } from "../middleware/authMiddleware.js";
+import { validate } from "../middleware/validateMiddleware.js";
 
-const router=express.Router()
+const router = express.Router();
 
-//Blood Needs
-router.post('/blood-need',bloodNeedController) 
+router.post("/", protect, bloodRequestValidation, validate, createBloodRequest);
+router.get("/", protect, getBloodRequests);
+router.patch("/:id/accept", protect, authorize("user", "volunteer"), acceptBloodRequest);
+router.patch("/:id/complete", protect, authorize("user", "volunteer", "admin"), completeBloodRequest);
 
-// Get all blood needs
-router.get('/get-blood-needs',getBloodNeedController)
-
-//Get Single Blood
-router.get('/get-single-blood/:id',getSingleBloodController)
-
-// delete Blood needs
-router.delete('/delete-blood-need/:id',deleteBloodNeedController)
-
-//update Blood need(accepted ans user id)
-router.put('/update-accepted/:id',needAcceptedController)
-
-// Update Blood Donation confirmed
-router.put('/update-confirmed/:id',needConfirmedController)
-
-export default router
+export default router;

@@ -43,9 +43,12 @@ const handelLogout=async()=>{
 
 const handelConfirm=async(pId)=>{
     try {
-      
+      let a=prompt("Enter the OTP to confirmed")
+      if(!a){
+        alert("OTP not found")
+      }
       const res  = await axios.put(`http://localhost:8080/api/v1/blood/update-confirmed/${pId}`,{isConfirmed:true});
-      console.log(res.data.success)
+     
       if(res.data.success){
         alert(res.data.message)
         // navigate('/profile')
@@ -54,17 +57,19 @@ const handelConfirm=async(pId)=>{
         alert(res.data.message)
       }
       
-      const payload1={isAccepted:false,acceptedUser:null}
-       await axios.put(`http://localhost:8080/api/v1/blood/update-accepted/${pId}`,payload1);
+      const payload2={isAccepted:false,acceptedUser:null}
+       await axios.put(`http://localhost:8080/api/v1/blood/update-accepted/${pId}`,payload2);
 
 
-
+       const email=acceptedBlood.email
+       const payload1={mailTo:email,sendText:"Congrats your blood need has been confirmed it will be sent to you shortly "}
+       await axios.post(`http://localhost:8080/api/v1/mail/send-mail`,payload1)
     
       
       
 
         const payload={donarId:id1,receiverId:pId}
-      
+        console.log(payload)
         const {data}= await axios.post(`http://localhost:8080/api/v1/history/create-history`,payload)
         if(data.success){
           alert(data.message)
@@ -110,6 +115,38 @@ const handelCancel=async(pId)=>{
     alert('Something Went Wrong in Showing History')
   }
  }
+
+ const blood=(bloodG)=>{
+  let b=''
+      switch(bloodG){
+        case 'AP':
+            b= 'A+';
+            break;
+        case 'AN':
+            b= 'A-';
+            break;
+        case 'BP':
+            b= 'B+';
+            break;
+        case 'BN':
+            b= 'B-';
+            break;
+        case 'ABP':
+            b= 'AB+';
+            break;
+        case 'ABN':
+            b= 'AB-';
+            break;
+        case 'OP':
+            b= 'O+';
+            break;
+        case 'ON':
+            b= 'O-';
+            break;
+      }
+      return b;
+}
+
  
 useEffect(()=>{
   getName();
@@ -120,7 +157,7 @@ useEffect(()=>{
   return (
     <div>
         <Navbar/>
-        <div className="profileFirst"> <div>Hello, {name} {id1} {id2}</div> <div><button className="logout" onClick={handelLogout}>Logout</button></div>  </div>
+        <div className="profileFirst"> <div>Hello, {name}</div> <div><button className="logout" onClick={handelLogout}>Logout</button></div>  </div>
         <hr />
         <div className="heading">Thanks for Accepting the Blood Need</div>
         <div className="pending">
@@ -131,6 +168,7 @@ useEffect(()=>{
           <div className="bloodCard2"> 
            <div className='bGroup' > <div> BloodGroup:</div>  <div> {acceptedBlood.bloodGroup} </div> </div>
            <div className='bName' > <div>Name:</div> <div>{acceptedBlood.name}</div>  </div>
+           <div className='bName' > <div>Email</div> <div>{acceptedBlood.email}</div>  </div>
            <div className='bMobile' > <div> Mobile No.:</div> <div>{acceptedBlood.phone}</div> </div>
            <div className='bHospital' > <div>Hospital:</div> <div>{acceptedBlood.hospital}</div>  </div>
            <div className='bAddress' ><div>Address:</div> <div>{acceptedBlood.address}</div>  </div>
@@ -149,9 +187,9 @@ useEffect(()=>{
     <div className="map">
 
     {receiver.map((p,index) => (
-      <div key={index}>
-       You Donated To  Name :{ p.receiverId.name } ,Phone:{p.receiverId.phone} ,BloodGroup :{p.receiverId.bloodGroup}
-      </div>
+      <div className='history' key={index}>
+      You Donated To { p.receiverId.name } ,&nbsp;&nbsp;&nbsp; Phone:{p.receiverId.phone}, &nbsp;&nbsp;&nbsp;BloodGroup :{ blood(p.receiverId.bloodGroup)} 
+      &nbsp;&nbsp;&nbsp; Date: {p.createdAt.split("T")[0]}</div>
     ))}
     </div>:<div className='else'>No History Found</div>}
   </div>

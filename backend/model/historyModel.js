@@ -11,7 +11,7 @@ const historySchema=mongoose.Schema({
     ref:"bloodNeeds",
     required:true
  }
-},{timeStamp:true})
+},{timestamps:true})
 
 
 export default mongoose.model('history',historySchema)

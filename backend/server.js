@@ -1,54 +1,27 @@
-import express  from "express";
-
 import dotenv from "dotenv";
-import mongoose from "mongoose"
-import morgan from "morgan";
-import cors from "cors";
-//Importing routes
-import authRoutes from './routes/authRoutes.js'
-import bloodRoutes from './routes/bloodRoutes.js'
-import historyRoutes from './routes/historyRoutes.js'
-import mailRoutes from './routes/mailRoutes.js'
-const app=express();
-dotenv.config()
+import { createServer } from "http";
+import { Server } from "socket.io";
+import app from "./app.js";
+import { connectDB } from "./config/db.js";
 
-// middleware
-app.use(cors())
-app.use(express.json())
-app.use(morgan('dev'))
+dotenv.config();
+await connectDB();
 
-
-// Connecting database
-const db= async()=>{
-    try {
-        await mongoose.connect(process.env.CLUSTER)
-        console.log(`db is connected`);
-    } catch (error) {
-        console.log(`Error in mongodb${error}`);
-    }
-}
-db();
-
-// Routes--------------------------------
-
-
-app.use('/api/v1/auth',authRoutes)
-app.use('/api/v1/blood',bloodRoutes)
-app.use('/api/v1/history',historyRoutes)
-app.use('/api/v1/mail',mailRoutes)
-
-
-app.get("/",(req,res)=>{
-    res.send({
-        message:"Welcome"
-    });
+const server = createServer(app);
+const io = new Server(server, {
+  cors: { origin: process.env.CLIENT_URL || "*" },
 });
 
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
 
+io.on("connection", (socket) => {
+  socket.on("join_room", (roomId) => socket.join(roomId));
+});
 
-
-// Port
-const PORT=process.env.PORT || 8080
-app.listen(PORT,()=>{
-    console.log(`Server Running on ${PORT}`) 
-})
+const PORT = process.env.PORT || 8080;
+server.listen(PORT, () => {
+  console.log(`LifeLink server running on ${PORT}`);
+});
