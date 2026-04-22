@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import axios from "axios";
+import api from "../lib/api";
 import { motion } from 'framer-motion';
 
 const Register = () => {
@@ -10,6 +10,7 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
   const [bloodGroup, setBloodGroup] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -38,8 +39,8 @@ const Register = () => {
     setIsLoading(true);
     
     try {
-      const payload = { name, email, password, phone, address, bloodGroup };
-      const res = await axios.post('http://localhost:8080/api/v1/auth/register', payload);
+      const payload = { name, email, password, phone, address, city, bloodGroup };
+      const res = await api.post('/auth/register', payload);
       
       if (res.data.success) {
         // Show success message
@@ -293,6 +294,23 @@ const Register = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    City
+                  </label>
+                  <div className="relative">
+                    <i className="fas fa-city absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all"
+                      placeholder="Your City"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                     Blood Group
                   </label>
                   <div className="relative">
@@ -304,14 +322,14 @@ const Register = () => {
                       required
                     >
                       <option value="">Select Blood Group</option>
-                      <option value="AP">A+</option>
-                      <option value="AN">A-</option>
-                      <option value="BP">B+</option>
-                      <option value="BN">B-</option>
-                      <option value="OP">O+</option>
-                      <option value="ON">O-</option>
-                      <option value="ABP">AB+</option>
-                      <option value="ABN">AB-</option>
+                      <option value="A+">A+</option>
+                      <option value="A-">A-</option>
+                      <option value="B+">B+</option>
+                      <option value="B-">B-</option>
+                      <option value="O+">O+</option>
+                      <option value="O-">O-</option>
+                      <option value="AB+">AB+</option>
+                      <option value="AB-">AB-</option>
                     </select>
                   </div>
                 </div>

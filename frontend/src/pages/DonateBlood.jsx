@@ -1,6 +1,6 @@
 import {useState,useEffect} from 'react'
 import Navbar from '../components/Navbar'
-import axios from 'axios'
+import api from '../lib/api'
 import { useNavigate } from 'react-router-dom'
 import '../css/DonateBlood.css'
 const DonateBlood = () => {
@@ -11,85 +11,44 @@ const DonateBlood = () => {
   const [createdBy, setCreatedBy] = useState()
   
   const getBloodNeeds=async()=>{
-    if(bloodGroup && address){
-      const {data}= await axios.get(`http://localhost:8080/api/v1/blood/get-blood-needs?bloodGroup=${bloodGroup}&addres=${address}`);
-       if(data.bloodNeeds.length==0){
-         alert('No Data Found regarding this filter')
-         window.location.reload()
-       }
-      
-      setBloodData(data.bloodNeeds.filter(item => item.isAccepted ==false));
-      return ;
-    }
-    if(address){
-      const {data}= await axios.get(`http://localhost:8080/api/v1/blood/get-blood-needs?address=${address}`);
-      if(data.bloodNeeds.length==0){
-        alert('No Data Found regarding this filter')
-        window.location.reload()
-      }
-      setBloodData(data.bloodNeeds.filter(item => item.isAccepted ==false));
-      return ;
-    }
-    if(bloodGroup){
-      const {data}= await axios.get(`http://localhost:8080/api/v1/blood/get-blood-needs?bloodGroup=${bloodGroup}`);
-      if(data.bloodNeeds.length==0){
-        alert('No Data Found regarding this filter')
-        window.location.reload()
+    let query = "?status=open";
+    if (bloodGroup) query += `&bloodGroup=${bloodGroup}`;
+    if (address) query += `&city=${address}`; // using address input for city
 
-      }
-      setBloodData(data.bloodNeeds.filter(item => item.isAccepted ==false));
-      return ;
+    const { data } = await api.get(`/blood${query}`);
+    if(data.data.length === 0){
+      alert('No Data Found regarding this filter')
+      window.location.reload()
     }
- 
-    const {data}= await axios.get('http://localhost:8080/api/v1/blood/get-blood-needs');
-    
-    setBloodData(data.bloodNeeds.filter(item => item.isConfirmed ==false).filter(item=>item.isAccepted==false));
-    
-   
+    setBloodData(data.data);
   }
 
 
   
-  var user = JSON.parse(localStorage.getItem('token'));
-   const id = user.existingUser._id
-   const email=user.existingUser.email
-const handelAccept=async(pId)=>{
-       try {
-       
-      
-      const res=await axios.get(`http://localhost:8080/api/v1/blood/get-single-blood/${pId}`)
-       if(res.data.bloodNeed.acceptedUser === id){
-        return alert("One one donation at a time")
-       }
-       if(res.data.bloodNeed.createdBy === id){
-        return alert("Can't Accept your Own Blood Need")
-       }
-       if(res.data.bloodNeed.isAccepted === true){  
-          return(window.location.reload() 
-          && alert("Someone has already Accepted the need")
-          )
-       }
-       
+  const userStr = localStorage.getItem('lifelink_user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  const id = user?._id;
 
-        
-        const payload={isAccepted:true,acceptedUser:id}
-        const { data } = await axios.put(`http://localhost:8080/api/v1/blood/update-accepted/${pId}`,payload);
-          
-        if(data.success){
-          alert(data.message)
-          navigate('/profile')
-        }
-        else{
-          alert(data.message)
-        }
-        const payload1={mailTo:email,sendText:"Thanks For accepting the Blood Need"}
-        await axios.post(`http://localhost:8080/api/v1/mail/send-mail`,payload1)
-
-       } catch (error) {
-        console.log(error)
-        alert("Something went wrong")
-       }
-}
+  const handelAccept=async(pId)=>{
+    if (!id) {
+      alert("Please login first");
+      navigate('/login');
+      return;
+    }
+    try {
+      const { data } = await api.patch(`/blood/${pId}/accept`);
+      if(data.success){
+        alert("Blood need accepted successfully!");
+        navigate('/profile')
+      }
+      else{
+        alert(data.message || "Failed to accept")
+      }
+    } catch (error) {
+      console.log(error)
+      alert(error.response?.data?.message || "Something went wrong")
+    }
+  }
 const removeFilter=()=>{
   alert('Filter Removed')
   window.location.reload()
@@ -138,14 +97,14 @@ const blood=(bloodG)=>{
         <input type="text" className='input' placeholder='Address' value={address} onChange={(e)=>setAddress(e.target.value)}/>
         <select className='bloodGroup' value={bloodGroup} onChange={(e)=>setBloodGroup(e.target.value)}>
         <option value="1" >Choose Blood Group:</option>
-        <option value="AP">A+</option>
-        <option value="AN">A-</option>
-        <option value="BP">B+</option>
-        <option value="BN">B-</option>
-        <option value="OP">O+</option>
-        <option value="ON">O-</option>
-        <option value="ABP">AB+</option>
-        <option value="ABN">AB-</option>
+        <option value="A+">A+</option>
+        <option value="A-">A-</option>
+        <option value="B+">B+</option>
+        <option value="B-">B-</option>
+        <option value="O+">O+</option>
+        <option value="O-">O-</option>
+        <option value="AB+">AB+</option>
+        <option value="AB-">AB-</option>
         
     </select>
         <button className='filterBtn' onClick={getBloodNeeds}>Apply filter</button>
@@ -156,16 +115,18 @@ const blood=(bloodG)=>{
         {bloodData.map((p, index) => (
      
          
-          <div className={ p.createdBy==id ?"bloodCard green":" bloodCard "} key={index} >
+          <div className={ p.requester?._id === id ?"bloodCard green":" bloodCard "} key={index} >
            
-           <div className='bGroup' > <div> BloodGroup:</div> <div> {blood(p.bloodGroup)}
+           <div className='bGroup' > <div> BloodGroup:</div> <div> {p.bloodGroup}
            </div> </div>
-           <div className='bName' > <div>Name:</div> <div>{p.name}</div>  </div>
-           <div className='bEmail' > <div>Email:</div> <div>{p.email}</div>  </div>
-           <div className='bMobile' > <div> Mobile No.:</div> <div>{p.phone}</div> </div>
-           <div className='bHospital' > <div>Hospital:</div> <div>{p.hospital}</div>  </div>
-           <div className='bAddress' ><div>Address:</div> <div>{p.address}</div>  </div>
-           <button className='acceptBtn' onClick={()=>handelAccept(p._id)}>Accept</button>
+           <div className='bName' > <div>Patient Name:</div> <div>{p.patientName}</div>  </div>
+           <div className='bEmail' > <div>Requester:</div> <div>{p.requester?.name || "Unknown"}</div>  </div>
+           <div className='bMobile' > <div> Units Required:</div> <div>{p.units}</div> </div>
+           <div className='bHospital' > <div>Hospital:</div> <div>{p.hospitalName}</div>  </div>
+           <div className='bAddress' ><div>City:</div> <div>{p.city}</div>  </div>
+           {p.requester?._id !== id && (
+             <button className='acceptBtn' onClick={()=>handelAccept(p._id)}>Accept</button>
+           )}
            </div>
             
         ))}

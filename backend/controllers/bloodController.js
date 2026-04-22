@@ -69,3 +69,12 @@ export const completeBloodRequest = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getDonationHistory = async (req, res, next) => {
+  try {
+    const history = await DonationHistory.find({ donor: req.user._id }).populate("bloodRequest");
+    return res.json({ success: true, data: history });
+  } catch (error) {
+    next(error);
+  }
+};

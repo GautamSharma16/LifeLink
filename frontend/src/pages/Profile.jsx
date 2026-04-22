@@ -2,7 +2,7 @@ import {useState,useEffect} from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import '../css/Profile.css'
-import axios from 'axios'
+import api from '../lib/api'
 const Profile = () => {
   const [name, setName] = useState()
   
@@ -11,105 +11,67 @@ const Profile = () => {
   const [receiver, setReceiver] = useState([])
   const [acceptedBlood, setAcceptedBlood] = useState([])
  const navigate=useNavigate()
- var user = JSON.parse(localStorage.getItem('token'));
- const id1=user.existingUser._id
+ const userStr = localStorage.getItem('lifelink_user');
+ const userObj = userStr ? JSON.parse(userStr) : null;
+ const id1 = userObj?._id;
   const getAcceptedBlood=async()=>{
-    const {data}= await axios.get('http://localhost:8080/api/v1/blood/get-blood-needs');
-    // console.log(data.bloodNeeds)
-
-   
-    const arr=data.bloodNeeds
-    
+    const {data}= await api.get('/blood?status=accepted');
+    const arr=data.data;
+    let found = false;
     for(let i=0;i<arr.length;i++){
-      if(arr[i].isAccepted == true && arr[i].acceptedUser== id1){
+      if(arr[i].donor && arr[i].donor._id === id1){
         setAcceptedBlood(arr[i]);
-        setId2(arr[i].acceptedUser)
-        setConfirmed(arr[i].isConfirmed)
+        setId2(arr[i].donor._id);
+        setConfirmed(arr[i].status === 'completed');
+        found = true;
+        break;
       }
+    }
+    if (!found) {
+      setAcceptedBlood([]);
+      setId2(null);
     }
   }
 
 const getName=async()=>{
-    var user = JSON.parse(localStorage.getItem('token'));
-  setName(user.existingUser.name)
+    const userStr = localStorage.getItem('lifelink_user');
+    const userObj = userStr ? JSON.parse(userStr) : null;
+    setName(userObj?.name);
 }
 
 
 const handelLogout=async()=>{
-  localStorage.removeItem("token");
+  localStorage.removeItem("lifelink_token");
+  localStorage.removeItem("lifelink_user");
   alert('Logout Successful')
   navigate('/login');
 }
 
 const handelConfirm=async(pId)=>{
     try {
-      let a=prompt("Enter the OTP to confirmed")
-      if(!a){
-        alert("OTP not found")
-      }
-      const res  = await axios.put(`http://localhost:8080/api/v1/blood/update-confirmed/${pId}`,{isConfirmed:true});
+      const res = await api.patch(`/blood/${pId}/complete`);
      
       if(res.data.success){
-        alert(res.data.message)
-        // navigate('/profile')
+        alert("Donation Completed Successfully!");
+        window.location.reload();
       }
       else{
         alert(res.data.message)
       }
-      
-      const payload2={isAccepted:false,acceptedUser:null}
-       await axios.put(`http://localhost:8080/api/v1/blood/update-accepted/${pId}`,payload2);
-
-
-       const email=acceptedBlood.email
-       const payload1={mailTo:email,sendText:"Congrats your blood need has been confirmed it will be sent to you shortly "}
-       await axios.post(`http://localhost:8080/api/v1/mail/send-mail`,payload1)
-    
-      
-      
-
-        const payload={donarId:id1,receiverId:pId}
-        console.log(payload)
-        const {data}= await axios.post(`http://localhost:8080/api/v1/history/create-history`,payload)
-        if(data.success){
-          alert(data.message)
-        }
-        else{
-          alert(data.message)
-        }
-
-       window.location.reload();
-
-
     } catch (error) {
       console.log(error)
       alert("Something went wrong ")
     }
 }
-const handelCancel=async(pId)=>{
-  try {
-    const payload={isAccepted:false,acceptedUser:null}
-        const { data } = await axios.put(`http://localhost:8080/api/v1/blood/update-accepted/${pId}`,payload);
 
-        if(data.success){
-          alert('Donation Canceled')
-          navigate('/donate-blood')
-        }
-        else{
-          alert('Cancel Failed')
-        }
-  } catch (error) {
-    console.log(error)
-    alert('Something Went Wrong in Canceling')
-  }
+const handelCancel=async(pId)=>{
+  alert("Cancellation is not supported in the current system.");
 }
 
  const getHistory=async()=>{
   try {
-     const {data}=await axios.get(`http://localhost:8080/api/v1/history/get-history?donarId=${id1}`)
-     
-     setReceiver(data.history)
-     
+     const {data}=await api.get(`/blood/history`)
+     setReceiver(data.data)
   } catch (error) {
     console.log(error)
     alert('Something Went Wrong in Showing History')
@@ -167,13 +129,12 @@ useEffect(()=>{
           <div className="box2">
           <div className="bloodCard2"> 
            <div className='bGroup' > <div> BloodGroup:</div>  <div> {acceptedBlood.bloodGroup} </div> </div>
-           <div className='bName' > <div>Name:</div> <div>{acceptedBlood.name}</div>  </div>
-           <div className='bName' > <div>Email</div> <div>{acceptedBlood.email}</div>  </div>
-           <div className='bMobile' > <div> Mobile No.:</div> <div>{acceptedBlood.phone}</div> </div>
-           <div className='bHospital' > <div>Hospital:</div> <div>{acceptedBlood.hospital}</div>  </div>
-           <div className='bAddress' ><div>Address:</div> <div>{acceptedBlood.address}</div>  </div>
-           <button className='confirmBtn' onClick={()=>handelConfirm(acceptedBlood._id)}>Confirm</button>
-           <button className='cancelBtn' onClick={()=>handelCancel(acceptedBlood._id)}>Cancel</button>
+           <div className='bName' > <div>Patient Name:</div> <div>{acceptedBlood.patientName}</div>  </div>
+           <div className='bName' > <div>Requester</div> <div>{acceptedBlood.requester?.name || "Unknown"}</div>  </div>
+           <div className='bMobile' > <div> Units:</div> <div>{acceptedBlood.units}</div> </div>
+           <div className='bHospital' > <div>Hospital:</div> <div>{acceptedBlood.hospitalName}</div>  </div>
+           <div className='bAddress' ><div>City:</div> <div>{acceptedBlood.city}</div>  </div>
+           <button className='confirmBtn' onClick={()=>handelConfirm(acceptedBlood._id)}>Confirm Completed</button>
            </div>
         </div> : <div className='else'> No Need Accepted</div>}
         </div>
@@ -188,7 +149,7 @@ useEffect(()=>{
 
     {receiver.map((p,index) => (
       <div className='history' key={index}>
-      You Donated To { p.receiverId.name } ,&nbsp;&nbsp;&nbsp; Phone:{p.receiverId.phone}, &nbsp;&nbsp;&nbsp;BloodGroup :{ blood(p.receiverId.bloodGroup)} 
+      You Donated To { p.bloodRequest?.patientName } ,&nbsp;&nbsp;&nbsp; Units:{p.unitsDonated}, &nbsp;&nbsp;&nbsp;City :{ p.city} 
       &nbsp;&nbsp;&nbsp; Date: {p.createdAt.split("T")[0]}</div>
     ))}
     </div>:<div className='else'>No History Found</div>}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Login = () => {
@@ -34,7 +34,7 @@ const Login = () => {
     
     try {
       const payload = { email, password };
-      const res = await axios.post('http://localhost:8080/api/v1/auth/login', payload);
+      const res = await api.post('/auth/login', payload);
       
       if (res.data.success) {
         // Show success message with animation
@@ -44,17 +44,8 @@ const Login = () => {
         document.body.appendChild(successMessage);
         setTimeout(() => successMessage.remove(), 3000);
 
-        localStorage.setItem("token", JSON.stringify(res.data));
-        
-        // Send email notification
-        try {
-          await axios.post(`http://localhost:8080/api/v1/mail/send-mail`, {
-            mailTo: email,
-            sendText: "You have successfully logged in to Life-Link. Get Help and Help others!"
-          });
-        } catch (mailError) {
-          console.log("Email notification failed:", mailError);
-        }
+        localStorage.setItem("lifelink_token", res.data.data.token);
+        localStorage.setItem("lifelink_user", JSON.stringify(res.data.data.user));
         
         setTimeout(() => navigate('/'), 1500);
       } else {

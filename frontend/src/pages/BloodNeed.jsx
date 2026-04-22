@@ -2,20 +2,22 @@ import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import { useNavigate } from 'react-router-dom';
 import '../css/BloodNeed.css';
-import axios from 'axios';
+import api from '../lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
 const BloodNeed = () => {
   const navigate = useNavigate();
+
   const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
-    name: "",
-    hospital: "",
-    phone: "",
-    address: "",
-    email: "",
-    bloodGroup: ""
+    patientName: "",
+    hospitalName: "",
+    city: "",
+    units: 1,
+    bloodGroup: "",
+    emergencyLevel: "medium",
   });
   const [errors, setErrors] = useState({});
   const [showSuccess, setShowSuccess] = useState(false);
@@ -31,22 +33,19 @@ const BloodNeed = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = "Name is required";
-    if (!formData.email.trim()) newErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Email is invalid";
-    if (!formData.phone.trim()) newErrors.phone = "Phone number is required";
-    else if (!/^\d{10}$/.test(formData.phone)) newErrors.phone = "Phone number must be 10 digits";
-    if (!formData.hospital.trim()) newErrors.hospital = "Hospital name is required";
-    if (!formData.address.trim()) newErrors.address = "Address is required";
+    if (!formData.patientName.trim()) newErrors.patientName = "Patient Name is required";
+    if (!formData.hospitalName.trim()) newErrors.hospitalName = "Hospital name is required";
+    if (!formData.city.trim()) newErrors.city = "City is required";
     if (!formData.bloodGroup) newErrors.bloodGroup = "Please select blood group";
-    
+    if (formData.units < 1) newErrors.units = "At least 1 unit is required";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleBloodNeed = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       toast.error("Please fill all required fields correctly");
       return;
@@ -54,23 +53,16 @@ const BloodNeed = () => {
 
     setLoading(true);
     try {
-      const user = JSON.parse(localStorage.getItem('token'));
-      if (!user || !user.existingUser) {
+      const userStr = localStorage.getItem('lifelink_user');
+      const user = userStr ? JSON.parse(userStr) : null;
+      if (!user) {
         toast.error("Please login to continue");
         navigate('/login');
         return;
       }
 
-      const id = user.existingUser._id;
-      const payload = {
-        ...formData,
-        isConfirmed: false,
-        createdBy: id,
-        isAccepted: false
-      };
+      const res = await api.post('/blood', formData);
 
-      const res = await axios.post('http://localhost:8080/api/v1/blood/blood-need', payload);
-      
       if (res.data.success) {
         toast.success(res.data.message || "Blood request submitted successfully!");
         setShowSuccess(true);
@@ -90,15 +82,16 @@ const BloodNeed = () => {
 
   const handleYourself = async () => {
     try {
-      const user = JSON.parse(localStorage.getItem('token'));
-      if (user && user.existingUser) {
+      const userStr = localStorage.getItem('lifelink_user');
+      const user = userStr ? JSON.parse(userStr) : null;
+      if (user) {
         setFormData({
-          address: user.existingUser.address || "",
-          name: user.existingUser.name || "",
-          bloodGroup: user.existingUser.bloodGroup || "",
-          email: user.existingUser.email || "",
-          phone: user.existingUser.phone || "",
-          hospital: formData.hospital // Preserve hospital field
+          patientName: user.name || "",
+          city: user.city || "",
+          bloodGroup: user.bloodGroup || "",
+          hospitalName: formData.hospitalName,
+          units: 1,
+          emergencyLevel: "medium"
         });
         toast.success("Profile details loaded successfully!");
       } else {
@@ -113,26 +106,26 @@ const BloodNeed = () => {
 
   const handleReset = () => {
     setFormData({
-      name: "",
-      hospital: "",
-      phone: "",
-      address: "",
-      email: "",
-      bloodGroup: ""
+      patientName: "",
+      hospitalName: "",
+      city: "",
+      units: 1,
+      bloodGroup: "",
+      emergencyLevel: "medium"
     });
     setErrors({});
     toast.success("Form reset successfully");
   };
 
   const bloodGroups = [
-    { value: "AP", label: "A+", color: "#e74c3c" },
-    { value: "AN", label: "A-", color: "#e67e22" },
-    { value: "BP", label: "B+", color: "#3498db" },
-    { value: "BN", label: "B-", color: "#2980b9" },
-    { value: "OP", label: "O+", color: "#27ae60" },
-    { value: "ON", label: "O-", color: "#2ecc71" },
-    { value: "ABP", label: "AB+", color: "#9b59b6" },
-    { value: "ABN", label: "AB-", color: "#8e44ad" }
+    { value: "A+", label: "A+", color: "#e74c3c" },
+    { value: "A-", label: "A-", color: "#e67e22" },
+    { value: "B+", label: "B+", color: "#3498db" },
+    { value: "B-", label: "B-", color: "#2980b9" },
+    { value: "O+", label: "O+", color: "#27ae60" },
+    { value: "O-", label: "O-", color: "#2ecc71" },
+    { value: "AB+", label: "AB+", color: "#9b59b6" },
+    { value: "AB-", label: "AB-", color: "#8e44ad" }
   ];
 
   return (
@@ -165,21 +158,21 @@ const BloodNeed = () => {
 
         <div className="blood-need-wrapper">
           {/* Left Side - Image Section */}
-          <motion.div 
+          <motion.div
             className="blood-need-image-section"
             initial={{ x: -50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.6 }}
           >
             <div className="image-content">
-              <motion.div 
+              <motion.div
                 className="floating-image"
                 animate={{ y: [0, -10, 0] }}
                 transition={{ repeat: Infinity, duration: 3 }}
               >
-                <img 
-                  src="https://img.freepik.com/free-vector/flat-design-volunteer-donating-blood_23-2148273548.jpg" 
-                  alt="Blood Donation" 
+                <img
+                  src="https://img.freepik.com/free-vector/flat-design-volunteer-donating-blood_23-2148273548.jpg"
+                  alt="Blood Donation"
                 />
               </motion.div>
               <div className="image-stats">
@@ -209,7 +202,7 @@ const BloodNeed = () => {
           </motion.div>
 
           {/* Right Side - Form Section */}
-          <motion.div 
+          <motion.div
             className="blood-need-form-section"
             initial={{ x: 50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
@@ -224,7 +217,7 @@ const BloodNeed = () => {
             </div>
 
             <div className="action-buttons">
-              <motion.button 
+              <motion.button
                 className="action-btn reset-btn"
                 onClick={handleReset}
                 whileHover={{ scale: 1.05 }}
@@ -233,7 +226,7 @@ const BloodNeed = () => {
                 <i className="fas fa-undo-alt"></i>
                 Reset Form
               </motion.button>
-              <motion.button 
+              <motion.button
                 className="action-btn self-btn"
                 onClick={handleYourself}
                 whileHover={{ scale: 1.05 }}
@@ -249,51 +242,51 @@ const BloodNeed = () => {
                 <div className="form-group">
                   <label>
                     <i className="fas fa-user"></i>
-                    Full Name
+                    Patient Name
                   </label>
                   <input
                     type="text"
-                    name="name"
-                    className={`form-input ${errors.name ? 'error' : ''}`}
-                    placeholder="Enter your full name"
-                    value={formData.name}
+                    name="patientName"
+                    className={`form-input ${errors.patientName ? 'error' : ''}`}
+                    placeholder="Enter patient name"
+                    value={formData.patientName}
                     onChange={handleChange}
                   />
-                  {errors.name && <span className="error-message">{errors.name}</span>}
+                  {errors.patientName && <span className="error-message">{errors.patientName}</span>}
                 </div>
 
                 <div className="form-group">
                   <label>
-                    <i className="fas fa-envelope"></i>
-                    Email Address
+                    <i className="fas fa-hospital"></i>
+                    Hospital Name
                   </label>
                   <input
-                    type="email"
-                    name="email"
-                    className={`form-input ${errors.email ? 'error' : ''}`}
-                    placeholder="your@email.com"
-                    value={formData.email}
+                    type="text"
+                    name="hospitalName"
+                    className={`form-input ${errors.hospitalName ? 'error' : ''}`}
+                    placeholder="Name of the hospital"
+                    value={formData.hospitalName}
                     onChange={handleChange}
                   />
-                  {errors.email && <span className="error-message">{errors.email}</span>}
+                  {errors.hospitalName && <span className="error-message">{errors.hospitalName}</span>}
                 </div>
               </div>
 
               <div className="form-row">
                 <div className="form-group">
                   <label>
-                    <i className="fas fa-phone-alt"></i>
-                    Phone Number
+                    <i className="fas fa-city"></i>
+                    City
                   </label>
                   <input
-                    type="tel"
-                    name="phone"
-                    className={`form-input ${errors.phone ? 'error' : ''}`}
-                    placeholder="10-digit mobile number"
-                    value={formData.phone}
+                    type="text"
+                    name="city"
+                    className={`form-input ${errors.city ? 'error' : ''}`}
+                    placeholder="City"
+                    value={formData.city}
                     onChange={handleChange}
                   />
-                  {errors.phone && <span className="error-message">{errors.phone}</span>}
+                  {errors.city && <span className="error-message">{errors.city}</span>}
                 </div>
 
                 <div className="form-group">
@@ -318,36 +311,39 @@ const BloodNeed = () => {
                 </div>
               </div>
 
-              <div className="form-group">
-                <label>
-                  <i className="fas fa-hospital"></i>
-                  Hospital Name
-                </label>
-                <input
-                  type="text"
-                  name="hospital"
-                  className={`form-input ${errors.hospital ? 'error' : ''}`}
-                  placeholder="Name of the hospital"
-                  value={formData.hospital}
-                  onChange={handleChange}
-                />
-                {errors.hospital && <span className="error-message">{errors.hospital}</span>}
-              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>
+                    <i className="fas fa-cubes"></i>
+                    Units Required
+                  </label>
+                  <input
+                    type="number"
+                    name="units"
+                    min="1"
+                    className={`form-input ${errors.units ? 'error' : ''}`}
+                    value={formData.units}
+                    onChange={handleChange}
+                  />
+                  {errors.units && <span className="error-message">{errors.units}</span>}
+                </div>
 
-              <div className="form-group">
-                <label>
-                  <i className="fas fa-map-marker-alt"></i>
-                  Address
-                </label>
-                <textarea
-                  name="address"
-                  className={`form-textarea ${errors.address ? 'error' : ''}`}
-                  placeholder="Full address for delivery/emergency"
-                  rows="3"
-                  value={formData.address}
-                  onChange={handleChange}
-                />
-                {errors.address && <span className="error-message">{errors.address}</span>}
+                <div className="form-group">
+                  <label>
+                    <i className="fas fa-exclamation-triangle"></i>
+                    Emergency Level
+                  </label>
+                  <select
+                    name="emergencyLevel"
+                    className="form-select"
+                    value={formData.emergencyLevel}
+                    onChange={handleChange}
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="critical">Critical</option>
+                  </select>
+                </div>
               </div>
 
               <motion.button
