@@ -13,6 +13,8 @@ const emptyForm = {
   bloodGroup: "O+",
   role: "user",
   avatar: "",
+  hospitalName: "",
+  vehicleNumber: "",
 };
 
 const bloodGroups = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
@@ -108,6 +110,8 @@ export default function ProfileV2() {
         city: form.city,
         bloodGroup: form.bloodGroup,
         avatarFile: avatarFile || undefined,
+        hospitalName: form.role === "hospital" ? form.hospitalName : undefined,
+        vehicleNumber: form.role === "ambulance_driver" ? form.vehicleNumber : undefined,
       };
 
       const response = await api.put("/auth/me", payload);
@@ -375,6 +379,8 @@ export default function ProfileV2() {
                       { label: "City", value: form.city || "Not provided", icon: "📍" },
                       { label: "Blood Group", value: form.bloodGroup, icon: "🩸" },
                       { label: "Address", value: form.address || "Not provided", icon: "🏠" },
+                      ...(form.role === "hospital" ? [{ label: "Hospital Name", value: form.hospitalName || "Not provided", icon: "🏥" }] : []),
+                      ...(form.role === "ambulance_driver" ? [{ label: "Vehicle Number", value: form.vehicleNumber || "Not provided", icon: "🚑" }] : []),
                     ].map((item) => (
                       <div key={item.label} className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50">
                         <span className="text-2xl">{item.icon}</span>
@@ -480,6 +486,34 @@ export default function ProfileV2() {
                         </select>
                       </div>
                     </div>
+
+                    {form.role === "hospital" && (
+                      <div>
+                        <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
+                          <span>🏥</span> Hospital Name
+                        </label>
+                        <input
+                          value={form.hospitalName || ""}
+                          onChange={(event) => handleChange("hospitalName", event.target.value)}
+                          className="w-full rounded-xl border border-slate-200 px-4 py-3 transition-all focus:border-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-100 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-rose-900/50"
+                          placeholder="Enter hospital name"
+                        />
+                      </div>
+                    )}
+
+                    {form.role === "ambulance_driver" && (
+                      <div>
+                        <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
+                          <span>🚑</span> Vehicle Number
+                        </label>
+                        <input
+                          value={form.vehicleNumber || ""}
+                          onChange={(event) => handleChange("vehicleNumber", event.target.value)}
+                          className="w-full rounded-xl border border-slate-200 px-4 py-3 transition-all focus:border-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-100 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-rose-900/50"
+                          placeholder="Enter vehicle number"
+                        />
+                      </div>
+                    )}
 
                     {/* Address */}
                     <div>

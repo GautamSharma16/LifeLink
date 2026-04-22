@@ -82,7 +82,14 @@ export default function UserDashboard() {
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 24 }}>
+      <div className="user-dashboard-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 24 }}>
+      <style>{`
+        @media (max-width: 900px) {
+          .user-dashboard-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
         <div style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 24, padding: 24 }}>
           <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 24 }}>Weekly Activity</h2>
           <ResponsiveContainer width="100%" height={260}>

@@ -96,7 +96,18 @@ export default function BloodNeed() {
         )}
       </AnimatePresence>
 
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 24px", display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 48, alignItems: "start" }}>
+      <div className="blood-need-grid" style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 24px", display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 48, alignItems: "start" }}>
+      <style>{`
+        @media (max-width: 900px) {
+          .blood-need-grid {
+            grid-template-columns: 1fr !important;
+            gap: 32px !important;
+          }
+          .blood-need-grid > div:first-child {
+            position: static !important;
+          }
+        }
+      `}</style>
 
         {/* Left - Info Panel */}
         <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>

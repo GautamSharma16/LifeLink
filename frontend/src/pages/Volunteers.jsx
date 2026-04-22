@@ -436,6 +436,7 @@ export default function Volunteers() {
               exit={{ opacity: 0 }}
             >
               {submitted ? (
+                // ... (keeping existing logic)
                 <motion.div
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
@@ -493,7 +494,14 @@ export default function Volunteers() {
                   </motion.button>
                 </motion.div>
               ) : (
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 32, maxWidth: 1100, margin: "0 auto" }}>
+                <div className="join-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 32, maxWidth: 1100, margin: "0 auto" }}>
+                <style>{`
+                  @media (max-width: 900px) {
+                    .join-grid {
+                      grid-template-columns: 1fr !important;
+                    }
+                  }
+                `}</style>
                   {/* Left - Benefits */}
                   <div>
                     <div style={{

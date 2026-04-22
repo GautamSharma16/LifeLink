@@ -22,6 +22,8 @@ export default function Auth() {
     city: "",
     bloodGroup: "O+",
     role: "user",
+    hospitalName: "",
+    vehicleNumber: "",
   });
 
   // Enhanced healthcare-themed images with better quality
@@ -93,6 +95,8 @@ export default function Auth() {
           city: form.city,
           bloodGroup: form.bloodGroup,
           role: form.role,
+          hospitalName: form.role === "hospital" ? form.hospitalName : undefined,
+          vehicleNumber: form.role === "ambulance_driver" ? form.vehicleNumber : undefined,
         });
         toast.success("Registration successful! Please login.");
         setIsRegister(false);
@@ -500,6 +504,28 @@ export default function Auth() {
                             <option value="ambulance_driver">Role: Ambulance Driver</option>
                           </select>
                         </div>
+                        {form.role === "hospital" && (
+                          <div className="relative group">
+                            <i className="fas fa-hospital absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
+                            <input
+                              className="w-full rounded-xl border border-slate-200 dark:border-slate-700 pl-12 pr-4 py-3 transition-all focus:border-rose-400 focus:ring-2 focus:ring-rose-400/20 outline-none dark:bg-slate-800 group-hover:border-rose-300"
+                              placeholder="Hospital Name"
+                              value={form.hospitalName}
+                              onChange={(e) => setForm({ ...form, hospitalName: e.target.value })}
+                            />
+                          </div>
+                        )}
+                        {form.role === "ambulance_driver" && (
+                          <div className="relative group">
+                            <i className="fas fa-truck-medical absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
+                            <input
+                              className="w-full rounded-xl border border-slate-200 dark:border-slate-700 pl-12 pr-4 py-3 transition-all focus:border-rose-400 focus:ring-2 focus:ring-rose-400/20 outline-none dark:bg-slate-800 group-hover:border-rose-300"
+                              placeholder="Vehicle Plate Number"
+                              value={form.vehicleNumber}
+                              onChange={(e) => setForm({ ...form, vehicleNumber: e.target.value })}
+                            />
+                          </div>
+                        )}
                       </motion.div>
                     </AnimatePresence>
                   )}

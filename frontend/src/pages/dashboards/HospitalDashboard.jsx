@@ -105,7 +105,17 @@ export default function HospitalDashboard() {
       {showCampForm && (
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 24, padding: 24, marginBottom: 32 }}>
           <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 16 }}>Organize Blood Donation Camp</h2>
-          <form onSubmit={handleCreateCamp} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <form className="camp-form" onSubmit={handleCreateCamp} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            <style>{`
+              @media (max-width: 600px) {
+                .camp-form {
+                  grid-template-columns: 1fr !important;
+                }
+                .camp-form > .col-span-2 {
+                  grid-column: span 1 !important;
+                }
+              }
+            `}</style>
             <input placeholder="Camp Title" className="p-3 border rounded-xl" required onChange={e => setCampData({...campData, title: e.target.value})} />
             <input placeholder="Location" className="p-3 border rounded-xl" required onChange={e => setCampData({...campData, location: e.target.value})} />
             <input type="date" className="p-3 border rounded-xl" required onChange={e => setCampData({...campData, date: e.target.value})} />

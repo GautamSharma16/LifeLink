@@ -47,7 +47,14 @@ export default function AmbulanceDashboard() {
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 24 }}>
+      <div className="amb-dashboard-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 24 }}>
+      <style>{`
+        @media (max-width: 900px) {
+          .amb-dashboard-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
         <div style={{ background: "#e2e8f0", borderRadius: 24, minHeight: 400, position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8" }}>
             <div style={{ textAlign: "center" }}>

@@ -169,7 +169,19 @@ export default function Hospitals() {
         </motion.div>
       </div>
 
-      <div style={{ maxWidth: 1400, margin: "-40px auto 0", padding: "0 24px 60px", display: "grid", gridTemplateColumns: "300px 1fr", gap: 32, alignItems: "start" }}>
+      <div className="hospital-grid" style={{ maxWidth: 1400, margin: "-40px auto 0", padding: "0 24px 60px", display: "grid", gridTemplateColumns: "300px 1fr", gap: 32, alignItems: "start" }}>
+      <style>{`
+        @media (max-width: 1024px) {
+          .hospital-grid {
+            grid-template-columns: 1fr !important;
+            margin-top: 20px !important;
+          }
+          .hospital-grid > div:first-child {
+            position: static !important;
+            margin-bottom: 20px;
+          }
+        }
+      `}</style>
 
         {/* Sidebar Filters - Glass Morphism */}
         <motion.div

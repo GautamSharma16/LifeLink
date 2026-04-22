@@ -310,7 +310,14 @@ export default function Ambulance() {
                   </motion.button>
                 </motion.div>
               ) : (
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32 }}>
+                <div className="amb-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32 }}>
+                <style>{`
+                  @media (max-width: 900px) {
+                    .amb-grid {
+                      grid-template-columns: 1fr !important;
+                    }
+                  }
+                `}</style>
                   {/* Left - Ambulance Types */}
                   <div>
                     <div style={{

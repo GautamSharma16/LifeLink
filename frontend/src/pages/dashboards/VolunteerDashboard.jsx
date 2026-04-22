@@ -79,7 +79,14 @@ export default function VolunteerDashboard() {
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+      <div className="volunteer-dashboard-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+      <style>{`
+        @media (max-width: 900px) {
+          .volunteer-dashboard-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
         <div style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 24, padding: 24 }}>
           <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 16 }}>Live Nearby Requests</h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
