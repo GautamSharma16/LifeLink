@@ -1,139 +1,236 @@
-import { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { NavLink, useNavigate, Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { getCurrentRole } from "../lib/auth";
 
 const publicLinks = [
-  ["Home", "/"],
-  ["About", "/about"],
-  ["Services", "/services"],
-  ["Contact", "/contact"],
+  { label: "Home", to: "/" },
+  { label: "About", to: "/about" },
+  { label: "Services", to: "/services" },
+  { label: "Contact", to: "/contact" },
 ];
 
 const privateLinks = [
-  ["Dashboard", "/dashboard"],
-  ["Request Blood", "/request-blood"],
-  ["Donate Blood", "/donate-blood"],
-  ["Ambulance", "/ambulance"],
-  ["Hospitals", "/hospitals"],
-  ["Volunteers", "/volunteers"],
-  ["Notifications", "/dashboard/notifications"],
-  ["Profile", "/dashboard/profile"],
+  { label: "Dashboard", to: "/dashboard", roles: ["user", "volunteer", "hospital", "ambulance_driver", "admin"] },
+  { label: "Request", to: "/request-blood", roles: ["user", "hospital", "admin"] },
+  { label: "Donate", to: "/donate-blood", roles: ["user", "volunteer", "admin"] },
+  { label: "Ambulance", to: "/ambulance", roles: ["user", "ambulance_driver", "hospital", "admin"] },
+  { label: "Hospitals", to: "/hospitals", roles: ["user", "admin"] },
+  { label: "Volunteers", to: "/volunteers", roles: ["user", "volunteer", "admin"] },
+  { label: "Alerts", to: "/notifications", roles: ["user", "volunteer", "hospital", "ambulance_driver", "admin"] },
+  { label: "Profile", to: "/profile", roles: ["user", "volunteer", "hospital", "ambulance_driver", "admin"] },
 ];
 
 export default function Navbar({ isLoggedIn = false, onLogout }) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-  const links = isLoggedIn ? privateLinks : publicLinks;
+  const [dark, setDark] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  
+  const role = isLoggedIn ? getCurrentRole() : null;
+  const links = isLoggedIn ? privateLinks.filter(l => l.roles.includes(role)) : publicLinks;
 
-  const handleNavigate = (to) => {
-    setMenuOpen(false);
-    navigate(to);
-  };
+  useEffect(() => {
+    const savedDark = localStorage.getItem("ll-dark") === "true";
+    setDark(savedDark);
+    document.documentElement.classList.toggle("dark", savedDark);
+  }, []);
 
-  const handleLogout = () => {
-    setMenuOpen(false);
-    onLogout?.();
+  useEffect(() => {
+    const handler = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handler);
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
+
+  const toggleDark = () => {
+    const next = !dark;
+    setDark(next);
+    document.documentElement.classList.toggle("dark", next);
+    localStorage.setItem("ll-dark", next);
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/80 shadow-sm backdrop-blur-xl dark:border-slate-800/70 dark:bg-slate-900/70">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
-        <button
-          type="button"
-          onClick={() => handleNavigate(isLoggedIn ? "/dashboard" : "/")}
-          className="bg-gradient-to-r from-rose-500 to-pink-600 bg-clip-text text-xl font-extrabold text-transparent"
+    <header
+      style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 50,
+        background: scrolled
+          ? "rgba(255,255,255,0.92)"
+          : "rgba(255,255,255,0.75)",
+        backdropFilter: "blur(20px)",
+        borderBottom: scrolled
+          ? "1px solid rgba(226,232,240,0.8)"
+          : "1px solid transparent",
+        transition: "all 0.3s ease",
+      }}
+      className="dark-nav"
+    >
+      <style>{`
+        .dark .dark-nav {
+          background: ${scrolled ? "rgba(15,23,42,0.92)" : "rgba(15,23,42,0.75)"} !important;
+          border-bottom: ${scrolled ? "1px solid rgba(51,65,85,0.7)" : "1px solid transparent"} !important;
+        }
+        .nav-link { text-decoration: none; border-radius: 12px; padding: 7px 14px; font-size: 14px; font-weight: 500; transition: all 0.2s; color: #475569; }
+        .nav-link:hover { background: #f1f5f9; color: #e11d48; }
+        .nav-link.active { background: linear-gradient(135deg,#e11d48,#db2777); color: #fff; }
+        .dark .nav-link { color: #94a3b8; }
+        .dark .nav-link:hover { background: #1e293b; color: #e11d48; }
+        .dark .nav-link.active { background: linear-gradient(135deg,#e11d48,#db2777); color: #fff; }
+        @font-face {}
+        @media(max-width:900px){ .desk-nav { display:none!important; } }
+        @media(min-width:901px){ .mob-toggle { display:none!important; } }
+      `}</style>
+
+      <nav
+        style={{
+          maxWidth: 1280,
+          margin: "0 auto",
+          padding: "12px 20px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 16,
+        }}
+      >
+        {/* Logo */}
+        <Link
+          to={isLoggedIn ? "/dashboard" : "/"}
+          style={{
+            fontFamily: "'Instrument Serif', serif",
+            fontSize: 24,
+            fontWeight: 700,
+            background: "linear-gradient(135deg,#e11d48,#db2777)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            textDecoration: "none",
+            letterSpacing: "-0.5px",
+            flexShrink: 0,
+          }}
         >
           LifeLink
-        </button>
+        </Link>
 
-        <div className="hidden items-center gap-2 rounded-2xl border border-slate-200 bg-white/80 p-1 dark:border-slate-700 dark:bg-slate-800/60 md:flex">
-          {links.map(([label, to]) => (
+        {/* Desktop Nav */}
+        <div
+          className="desk-nav"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
+            background: "rgba(248,250,252,0.8)",
+            border: "1px solid rgba(226,232,240,0.7)",
+            borderRadius: 16,
+            padding: "4px 6px",
+          }}
+        >
+          {links.map((l) => (
             <NavLink
-              key={to}
-              to={to}
-              className={({ isActive }) =>
-                `rounded-xl px-3 py-2 text-sm font-medium transition ${
-                  isActive
-                    ? "bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-rose-500 dark:text-slate-300 dark:hover:bg-slate-700/70"
-                }`
-              }
+              key={l.to}
+              to={l.to}
+              className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}
             >
-              {label}
+              {l.label}
             </NavLink>
           ))}
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Right Controls */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
           <button
-            type="button"
-            onClick={() => document.documentElement.classList.toggle("dark")}
-            className="rounded-xl border border-slate-200 bg-slate-100 px-3 py-2 text-sm font-medium transition hover:bg-slate-200 dark:border-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600"
+            onClick={toggleDark}
+            style={{
+              border: "1px solid rgba(226,232,240,0.8)",
+              background: "rgba(248,250,252,0.8)",
+              borderRadius: 10,
+              padding: "8px 12px",
+              fontSize: 14,
+              cursor: "pointer",
+              fontFamily: "'DM Sans',sans-serif",
+              color: "#475569",
+              transition: "all 0.2s",
+            }}
           >
-            Theme
+            {dark ? "☀️" : "🌙"}
           </button>
+
           {isLoggedIn ? (
             <button
-              type="button"
-              onClick={handleLogout}
-              className="rounded-xl bg-gradient-to-r from-rose-500 to-pink-600 px-3 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+              onClick={() => { onLogout?.(); }}
+              style={{
+                background: "linear-gradient(135deg,#e11d48,#db2777)",
+                color: "#fff",
+                border: "none",
+                borderRadius: 10,
+                padding: "8px 16px",
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: "pointer",
+                fontFamily: "'DM Sans',sans-serif",
+              }}
             >
               Logout
             </button>
           ) : (
             <NavLink
               to="/login"
-              className="rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-3 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+              style={{
+                background: "linear-gradient(135deg,#10b981,#059669)",
+                color: "#fff",
+                borderRadius: 10,
+                padding: "8px 16px",
+                fontSize: 14,
+                fontWeight: 600,
+                textDecoration: "none",
+              }}
             >
               Login
             </NavLink>
           )}
+
           <button
-            type="button"
-            onClick={() => setMenuOpen((open) => !open)}
-            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 md:hidden"
+            className="mob-toggle"
+            onClick={() => setMenuOpen(!menuOpen)}
+            style={{
+              border: "1px solid rgba(226,232,240,0.8)",
+              background: "rgba(248,250,252,0.8)",
+              borderRadius: 10,
+              padding: "8px 12px",
+              fontSize: 20,
+              cursor: "pointer",
+              lineHeight: 1,
+            }}
           >
-            Menu
+            {menuOpen ? "✕" : "☰"}
           </button>
         </div>
       </nav>
 
-      {menuOpen && (
-        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 pb-3 md:hidden">
-          {links.map(([label, to]) => (
-            <NavLink
-              key={to}
-              to={to}
-              onClick={() => setMenuOpen(false)}
-              className={({ isActive }) =>
-                `rounded-full px-3 py-2 text-sm font-semibold transition ${
-                  isActive
-                    ? "bg-gradient-to-r from-rose-500 to-pink-600 text-white"
-                    : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
-                }`
-              }
-            >
-              {label}
-            </NavLink>
-          ))}
-          {isLoggedIn ? (
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="rounded-full bg-gradient-to-r from-rose-500 to-pink-600 px-3 py-2 text-sm font-semibold text-white transition hover:opacity-90"
-            >
-              Logout
-            </button>
-          ) : (
-            <NavLink
-              to="/login"
-              onClick={() => setMenuOpen(false)}
-              className="rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 px-3 py-2 text-sm font-semibold text-white transition hover:opacity-90"
-            >
-              Login
-            </NavLink>
-          )}
-        </div>
-      )}
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            style={{ overflow: "hidden", borderTop: "1px solid rgba(226,232,240,0.5)" }}
+          >
+            <div style={{ padding: "12px 20px 16px", display: "flex", flexDirection: "column", gap: 6 }}>
+              {links.map((l) => (
+                <NavLink
+                  key={l.to}
+                  to={l.to}
+                  onClick={() => setMenuOpen(false)}
+                  className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}
+                  style={{ display: "block" }}
+                >
+                  {l.label}
+                </NavLink>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

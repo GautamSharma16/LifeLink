@@ -13,13 +13,11 @@ import Notifications from "./pages/Notifications";
 import ProfileV2 from "./pages/ProfileV2";
 import ResetPassword from "./pages/ResetPassword";
 import RoleDashboard from "./pages/RoleDashboard";
-import {
-  AmbulancePage,
-  DonateBloodPage,
-  HospitalsPage,
-  RequestBloodPage,
-  VolunteersPage,
-} from "./pages/modules";
+import AmbulancePage from "./pages/Ambulance";
+import DonateBloodPage from "./pages/DonateBlood";
+import HospitalsPage from "./pages/Hospital";
+import RequestBloodPage from "./pages/BloodNeed";
+import VolunteersPage from "./pages/Volunteers";
 
 
 function App() {
