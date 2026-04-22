@@ -11,7 +11,8 @@ import hospitalRoutes from "./routes/hospitalRoutes.js";
 import volunteerRoutes from "./routes/volunteerRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
-import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
+import campRoutes from "./routes/campRoutes.js";
+ import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 
 const app = express();
 const limiter = rateLimit({
@@ -39,6 +40,7 @@ app.use("/api/v1/volunteers", volunteerRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/notifications", notificationRoutes);
+ app.use("/api/v1/camps", campRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

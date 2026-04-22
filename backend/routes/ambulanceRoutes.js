@@ -1,17 +1,17 @@
 import express from "express";
-import {
-  ambulanceValidation,
-  assignAmbulance,
-  createAmbulanceRequest,
-  getAmbulanceRequests,
+import { protect } from "../middlewares/auth.js";
+import { 
+  createAmbulanceRequest, 
+  getAmbulanceRequests, 
+  acceptAmbulanceRequest, 
+  updateAmbulanceStatus 
 } from "../controllers/ambulanceController.js";
-import { authorize, protect } from "../middleware/authMiddleware.js";
-import { validate } from "../middleware/validateMiddleware.js";
 
 const router = express.Router();
 
-router.post("/", protect, ambulanceValidation, validate, createAmbulanceRequest);
+router.post("/", protect, createAmbulanceRequest);
 router.get("/", protect, getAmbulanceRequests);
-router.patch("/:id/assign", protect, authorize("ambulance_driver", "admin"), assignAmbulance);
+router.put("/:id/accept", protect, acceptAmbulanceRequest);
+router.put("/:id/status", protect, updateAmbulanceStatus);
 
 export default router;

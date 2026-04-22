@@ -11,7 +11,6 @@ const userSchema = new mongoose.Schema(
     bloodGroup: {
       type: String,
       enum: ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"],
-      required: true,
     },
     role: {
       type: String,
@@ -19,6 +18,15 @@ const userSchema = new mongoose.Schema(
       default: "user",
       index: true,
     },
+    // Hospital Specific
+    hospitalName: { type: String },
+    availableBeds: { type: Number, default: 0 },
+    icuBeds: { type: Number, default: 0 },
+    oxygenCylinders: { type: Number, default: 0 },
+    // Ambulance Specific
+    vehicleNumber: { type: String },
+    isAvailable: { type: Boolean, default: true },
+    
     avatar: { type: String, default: "" },
     achievements: [{ type: String }],
     isBanned: { type: Boolean, default: false },

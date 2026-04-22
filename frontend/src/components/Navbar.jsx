@@ -63,6 +63,8 @@ export default function Navbar({ isLoggedIn = false, onLogout }) {
           ? "1px solid rgba(226,232,240,0.8)"
           : "1px solid transparent",
         transition: "all 0.3s ease",
+        width: "100%",
+        boxSizing: "border-box",
       }}
       className="dark-nav"
     >
@@ -85,12 +87,14 @@ export default function Navbar({ isLoggedIn = false, onLogout }) {
       <nav
         style={{
           maxWidth: 1280,
+          width: "100%",
           margin: "0 auto",
           padding: "12px 20px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           gap: 16,
+          boxSizing: "border-box",
         }}
       >
         {/* Logo */}

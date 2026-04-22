@@ -60,14 +60,14 @@ function App() {
           </Layout>
         </ProtectedWrapper>
       } />
-      <Route path="/dashboard/notifications" element={
+      <Route path="/notifications" element={
         <ProtectedWrapper>
           <Layout>
             <Notifications />
           </Layout>
         </ProtectedWrapper>
       } />
-      <Route path="/dashboard/profile" element={
+      <Route path="/profile" element={
         <ProtectedWrapper>
           <Layout>
             <ProfileV2 />

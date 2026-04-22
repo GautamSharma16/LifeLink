@@ -12,7 +12,6 @@ export const registerValidation = [
   body("phone").notEmpty(),
   body("address").notEmpty(),
   body("city").notEmpty(),
-  body("bloodGroup").notEmpty(),
 ];
 
 export const loginValidation = [body("email").isEmail(), body("password").notEmpty()];
@@ -120,6 +119,11 @@ export const updateProfile = async (req, res, next) => {
       address: req.body.address,
       city: req.body.city,
       bloodGroup: req.body.bloodGroup,
+      hospitalName: req.body.hospitalName,
+      availableBeds: req.body.availableBeds,
+      icuBeds: req.body.icuBeds,
+      oxygenCylinders: req.body.oxygenCylinders,
+      vehicleNumber: req.body.vehicleNumber,
     };
 
     if (req.body.avatarFile) {

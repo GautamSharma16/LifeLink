@@ -15,6 +15,18 @@ export const createBloodRequest = async (req, res, next) => {
   try {
     const bloodRequest = await BloodRequest.create({ ...req.body, requester: req.user._id });
     req.io.emit("blood_request_created", bloodRequest);
+
+    const User = (await import("../models/User.js")).default;
+    const usersToNotify = await User.find({ city: bloodRequest.city, _id: { $ne: req.user._id } });
+
+    const notifications = usersToNotify.map(u => ({
+      user: u._id,
+      title: `Urgent: ${bloodRequest.bloodGroup} Needed`,
+      message: `${bloodRequest.patientName} needs blood at ${bloodRequest.hospitalName}.`,
+      type: "blood"
+    }));
+    await Notification.insertMany(notifications);
+
     return res.status(201).json({ success: true, data: bloodRequest });
   } catch (error) {
     next(error);
