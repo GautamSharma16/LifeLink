@@ -195,6 +195,7 @@ export default function Ambulance() {
           borderRadius: 20,
           padding: "6px",
           display: "flex",
+          flexWrap: "wrap",
           gap: 6,
           marginBottom: 32,
           boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
@@ -764,7 +765,14 @@ export default function Ambulance() {
                 border: "1px solid #f1f5f9"
               }}>
                 <h3 style={{ fontSize: 22, fontWeight: 700, marginBottom: 24, textAlign: "center" }}>Frequently Asked Questions</h3>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20 }}>
+                <div className="faq-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20 }}>
+                  <style>{`
+                    @media (max-width: 768px) {
+                      .faq-grid {
+                        grid-template-columns: 1fr !important;
+                      }
+                    }
+                  `}</style>
                   {[
                     { q: "How fast is the response time?", a: "Average response time is 8-12 minutes depending on your location and traffic conditions." },
                     { q: "Are paramedics available?", a: "Yes, all our ambulances come with trained paramedics and basic life support equipment." },

@@ -23,46 +23,58 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 24 }}>
+      <div className="admin-dashboard-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 24 }}>
+        <style>{`
+          @media (max-width: 900px) {
+            .admin-dashboard-grid {
+              grid-template-columns: 1fr !important;
+            }
+          }
+          .admin-table-container {
+            overflow-x: auto;
+          }
+        `}</style>
         <div style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 24, padding: 24 }}>
           <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 16 }}>User Management</h2>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr style={{ borderBottom: "2px solid #e2e8f0", textAlign: "left", color: "#64748b", fontSize: 13 }}>
-                <th style={{ padding: "12px 8px" }}>User</th>
-                <th style={{ padding: "12px 8px" }}>Role</th>
-                <th style={{ padding: "12px 8px" }}>Status</th>
-                <th style={{ padding: "12px 8px", textAlign: "right" }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                { name: "Apollo Hospital", email: "contact@apollo.in", role: "hospital", status: "Pending" },
-                { name: "Rahul Sharma", email: "rahul@gmail.com", role: "volunteer", status: "Verified" },
-                { name: "John Doe", email: "john@example.com", role: "user", status: "Verified" },
-              ].map((u, i) => (
-                <tr key={i} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                  <td style={{ padding: "16px 8px" }}>
-                    <p style={{ fontWeight: 600, margin: 0, fontSize: 14 }}>{u.name}</p>
-                    <p style={{ color: "#64748b", margin: 0, fontSize: 12 }}>{u.email}</p>
-                  </td>
-                  <td style={{ padding: "16px 8px" }}>
-                    <span style={{ background: "#f1f5f9", padding: "4px 8px", borderRadius: 8, fontSize: 12, fontWeight: 600, textTransform: "capitalize" }}>{u.role}</span>
-                  </td>
-                  <td style={{ padding: "16px 8px" }}>
-                    <span style={{ color: u.status === "Verified" ? "#10b981" : "#f59e0b", fontWeight: 600, fontSize: 13 }}>{u.status}</span>
-                  </td>
-                  <td style={{ padding: "16px 8px", textAlign: "right" }}>
-                    {u.status === "Pending" ? (
-                      <button style={{ background: "#10b981", color: "#fff", border: "none", padding: "6px 12px", borderRadius: 8, cursor: "pointer", fontWeight: 600, fontSize: 12 }}>Verify</button>
-                    ) : (
-                      <button style={{ background: "#fee2e2", color: "#e11d48", border: "none", padding: "6px 12px", borderRadius: 8, cursor: "pointer", fontWeight: 600, fontSize: 12 }}>Suspend</button>
-                    )}
-                  </td>
+          <div className="admin-table-container">
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "500px" }}>
+              <thead>
+                <tr style={{ borderBottom: "2px solid #e2e8f0", textAlign: "left", color: "#64748b", fontSize: 13 }}>
+                  <th style={{ padding: "12px 8px" }}>User</th>
+                  <th style={{ padding: "12px 8px" }}>Role</th>
+                  <th style={{ padding: "12px 8px" }}>Status</th>
+                  <th style={{ padding: "12px 8px", textAlign: "right" }}>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {[
+                  { name: "Apollo Hospital", email: "contact@apollo.in", role: "hospital", status: "Pending" },
+                  { name: "Rahul Sharma", email: "rahul@gmail.com", role: "volunteer", status: "Verified" },
+                  { name: "John Doe", email: "john@example.com", role: "user", status: "Verified" },
+                ].map((u, i) => (
+                  <tr key={i} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                    <td style={{ padding: "16px 8px" }}>
+                      <p style={{ fontWeight: 600, margin: 0, fontSize: 14 }}>{u.name}</p>
+                      <p style={{ color: "#64748b", margin: 0, fontSize: 12 }}>{u.email}</p>
+                    </td>
+                    <td style={{ padding: "16px 8px" }}>
+                      <span style={{ background: "#f1f5f9", padding: "4px 8px", borderRadius: 8, fontSize: 12, fontWeight: 600, textTransform: "capitalize" }}>{u.role}</span>
+                    </td>
+                    <td style={{ padding: "16px 8px" }}>
+                      <span style={{ color: u.status === "Verified" ? "#10b981" : "#f59e0b", fontWeight: 600, fontSize: 13 }}>{u.status}</span>
+                    </td>
+                    <td style={{ padding: "16px 8px", textAlign: "right" }}>
+                      {u.status === "Pending" ? (
+                        <button style={{ background: "#10b981", color: "#fff", border: "none", padding: "6px 12px", borderRadius: 8, cursor: "pointer", fontWeight: 600, fontSize: 12 }}>Verify</button>
+                      ) : (
+                        <button style={{ background: "#fee2e2", color: "#e11d48", border: "none", padding: "6px 12px", borderRadius: 8, cursor: "pointer", fontWeight: 600, fontSize: 12 }}>Suspend</button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>

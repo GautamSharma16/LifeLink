@@ -478,7 +478,14 @@ export default function Hospitals() {
                         exit={{ height: 0, opacity: 0 }}
                         style={{ overflow: "hidden", borderTop: "1px solid #f1f5f9" }}
                       >
-                        <div style={{ padding: "24px", background: "#fafbff", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
+                        <div className="hospital-details-grid" style={{ padding: "24px", background: "#fafbff", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
+                          <style>{`
+                            @media (max-width: 768px) {
+                              .hospital-details-grid {
+                                grid-template-columns: 1fr !important;
+                              }
+                            }
+                          `}</style>
                           <div>
                             <p style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1, marginBottom: 12 }}>All Specialties</p>
                             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>

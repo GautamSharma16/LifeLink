@@ -361,9 +361,9 @@ export default function ProfileV2() {
               {!isEditing ? (
                 <motion.div
                   key="details"
-                  initial={{ opacity: 0, opacity: 0 }}
-                  animate={{ opacity: 1, opacity: 1 }}
-                  exit={{ opacity: 0, opacity: 0 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                   className="space-y-8"
                 >
                   <div className="mb-6 border-b border-slate-200 pb-4 dark:border-slate-700">

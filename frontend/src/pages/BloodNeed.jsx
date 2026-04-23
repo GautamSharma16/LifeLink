@@ -107,6 +107,11 @@ export default function BloodNeed() {
             position: static !important;
           }
         }
+        @media (max-width: 600px) {
+          .form-row {
+            grid-template-columns: 1fr !important;
+          }
+        }
       `}</style>
 
         {/* Left - Info Panel */}
@@ -190,7 +195,7 @@ export default function BloodNeed() {
               </div>
 
               {/* Row: Patient + Hospital */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <div className="form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                 <div>
                   <label style={{ fontSize: 13, fontWeight: 600, color: "#374151", display: "block", marginBottom: 6 }}>Patient Name *</label>
                   <input name="patientName" placeholder="Full name" value={form.patientName} onChange={handleChange} style={inputStyle("patientName")} />
@@ -204,7 +209,7 @@ export default function BloodNeed() {
               </div>
 
               {/* Row: City + Units */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <div className="form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                 <div>
                   <label style={{ fontSize: 13, fontWeight: 600, color: "#374151", display: "block", marginBottom: 6 }}>City *</label>
                   <input name="city" placeholder="City" value={form.city} onChange={handleChange} style={inputStyle("city")} />

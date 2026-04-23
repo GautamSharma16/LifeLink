@@ -33,6 +33,18 @@ export default function Notifications() {
     }
   };
 
+  const deleteNotification = async (id, e) => {
+    e.stopPropagation();
+    try {
+      await api.delete(`/notifications/${id}`);
+      setNotifications(prev => prev.filter(n => n._id !== id));
+      toast.success("Notification deleted");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete notification");
+    }
+  };
+
   const getIcon = (type) => {
     switch(type) {
       case 'blood': return '🩸';
@@ -67,6 +79,7 @@ export default function Notifications() {
                 key={n._id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
                 transition={{ delay: i * 0.05 }}
                 onClick={() => !n.read && markRead(n._id)}
                 style={{ 
@@ -89,7 +102,16 @@ export default function Notifications() {
                 <div style={{ flex: 1 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
                     <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: n.read ? "#64748b" : "#1e293b" }}>{n.title}</h3>
-                    <span style={{ fontSize: 12, color: "#94a3b8" }}>{new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <span style={{ fontSize: 12, color: "#94a3b8" }}>{new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      <button 
+                        onClick={(e) => deleteNotification(n._id, e)}
+                        style={{ background: "transparent", border: "none", cursor: "pointer", color: "#ef4444", padding: 4, borderRadius: 8 }}
+                        title="Delete notification"
+                      >
+                        🗑️
+                      </button>
+                    </div>
                   </div>
                   <p style={{ fontSize: 14, color: n.read ? "#94a3b8" : "#475569", margin: 0, lineHeight: 1.5 }}>{n.message}</p>
                 </div>

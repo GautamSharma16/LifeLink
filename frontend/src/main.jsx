@@ -7,6 +7,8 @@ import App from "./App.jsx";
 import "./index.css";
 import { SocketProvider } from "./context/SocketContext.jsx";
 
+import ErrorBoundary from "./components/ErrorBoundary.jsx";
+
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -14,7 +16,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <SocketProvider>
-          <App />
+          <ErrorBoundary>
+            <App />
+          </ErrorBoundary>
           <Toaster position="top-right" />
         </SocketProvider>
       </BrowserRouter>

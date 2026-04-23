@@ -188,6 +188,7 @@ export default function Volunteers() {
           borderRadius: 20,
           padding: "6px",
           display: "flex",
+          flexWrap: "wrap",
           gap: 6,
           marginBottom: 32,
           boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
@@ -501,6 +502,11 @@ export default function Volunteers() {
                       grid-template-columns: 1fr !important;
                     }
                   }
+                  @media (max-width: 600px) {
+                    .form-row {
+                      grid-template-columns: 1fr !important;
+                    }
+                  }
                 `}</style>
                   {/* Left - Benefits */}
                   <div>
@@ -575,7 +581,7 @@ export default function Volunteers() {
                   }}>
                     <h3 style={{ fontSize: 22, fontWeight: 700, marginBottom: 24 }}>Join as Volunteer</h3>
                     <form onSubmit={handleJoin} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                      <div className="form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                         <div>
                           <label style={{ fontSize: 13, fontWeight: 600, display: "block", marginBottom: 8 }}>Full Name *</label>
                           <input
