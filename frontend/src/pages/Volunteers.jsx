@@ -496,7 +496,7 @@ export default function Volunteers() {
                 </motion.div>
               ) : (
                 <div className="join-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 32, maxWidth: 1100, margin: "0 auto" }}>
-                <style>{`
+                  <style>{`
                   @media (max-width: 900px) {
                     .join-grid {
                       grid-template-columns: 1fr !important;

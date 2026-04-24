@@ -38,7 +38,7 @@ export default function AmbulanceDashboard() {
         <div>
           <h1 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 40, fontWeight: 700 }}>Driver Dashboard</h1>
         </div>
-        <button 
+        <button
           onClick={() => setOnline(!online)}
           style={{ background: online ? "#10b981" : "#e2e8f0", color: online ? "#fff" : "#64748b", padding: "12px 24px", borderRadius: 24, fontWeight: 700, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, transition: "0.2s" }}
         >
@@ -48,7 +48,7 @@ export default function AmbulanceDashboard() {
       </div>
 
       <div className="amb-dashboard-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 24 }}>
-      <style>{`
+        <style>{`
         @media (max-width: 900px) {
           .amb-dashboard-grid {
             grid-template-columns: 1fr !important;
@@ -75,7 +75,7 @@ export default function AmbulanceDashboard() {
                 <p style={{ fontWeight: 600, margin: "0 0 4px" }}>Pickup: {req.pickupAddress}</p>
                 <p style={{ fontSize: 14, color: "#64748b", margin: "0 0 4px" }}>To: {req.hospitalDestination}</p>
                 <p style={{ fontSize: 13, color: "#e11d48", fontWeight: 700, marginBottom: 12 }}>Condition: {req.patientCondition}</p>
-                <button 
+                <button
                   onClick={() => handleAccept(req._id)}
                   style={{ width: "100%", background: "linear-gradient(135deg,#e11d48,#db2777)", color: "#fff", padding: "12px", borderRadius: 12, border: "none", fontWeight: 700, cursor: "pointer" }}
                 >

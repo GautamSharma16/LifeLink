@@ -97,7 +97,7 @@ export default function BloodNeed() {
       </AnimatePresence>
 
       <div className="blood-need-grid" style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 24px", display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 48, alignItems: "start" }}>
-      <style>{`
+        <style>{`
         @media (max-width: 900px) {
           .blood-need-grid {
             grid-template-columns: 1fr !important;

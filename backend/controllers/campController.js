@@ -58,6 +58,24 @@ export const joinCamp = async (req, res, next) => {
     camp.volunteersJoined.push(req.user._id);
     await camp.save();
 
+    const Notification = (await import("../models/Notification.js")).default;
+    
+    // Notify the hospital
+    await Notification.create({
+      user: camp.hospital,
+      title: "New Volunteer for Camp",
+      message: `${req.user.name} joined your camp at ${camp.location}.`,
+      type: "camp"
+    });
+
+    // Notify the volunteer
+    await Notification.create({
+      user: req.user._id,
+      title: "Successfully Joined Camp",
+      message: `You are now a volunteer for the camp at ${camp.location}.`,
+      type: "camp"
+    });
+
     req.io.emit("camp_joined", { campId: camp._id, user: req.user.name });
 
     return res.json({ success: true, data: camp });

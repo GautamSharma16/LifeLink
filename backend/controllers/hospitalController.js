@@ -1,9 +1,9 @@
-import Hospital from "../models/Hospital.js";
+import User from "../models/User.js";
 
 export const createHospital = async (req, res, next) => {
   try {
-    const hospital = await Hospital.create({ ...req.body, ownerUser: req.user._id });
-    res.status(201).json({ success: true, data: hospital });
+    // Legacy support or remove
+    res.status(201).json({ success: true, message: "Use profile update instead" });
   } catch (error) {
     next(error);
   }
@@ -12,7 +12,8 @@ export const createHospital = async (req, res, next) => {
 export const listHospitals = async (req, res, next) => {
   try {
     const { city } = req.query;
-    const hospitals = await Hospital.find({ ...(city && { city }) }).sort({ verified: -1, createdAt: -1 });
+    const filter = { role: "hospital", ...(city && { city }) };
+    const hospitals = await User.find(filter).sort({ createdAt: -1 });
     res.json({ success: true, data: hospitals });
   } catch (error) {
     next(error);

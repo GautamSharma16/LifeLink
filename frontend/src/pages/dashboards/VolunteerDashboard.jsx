@@ -56,7 +56,7 @@ export default function VolunteerDashboard() {
           <h1 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 40, fontWeight: 700 }}>Volunteer Portal</h1>
           <p style={{ color: "#64748b" }}>Manage your availability and accept requests.</p>
         </div>
-        <button 
+        <button
           onClick={() => setOnline(!online)}
           style={{ background: online ? "#10b981" : "#e2e8f0", color: online ? "#fff" : "#64748b", padding: "12px 24px", borderRadius: 24, fontWeight: 700, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, transition: "0.2s" }}
         >
@@ -80,7 +80,7 @@ export default function VolunteerDashboard() {
       </div>
 
       <div className="volunteer-dashboard-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
-      <style>{`
+        <style>{`
         @media (max-width: 900px) {
           .volunteer-dashboard-grid {
             grid-template-columns: 1fr !important;
@@ -101,7 +101,7 @@ export default function VolunteerDashboard() {
                   <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>Blood Needed ({req.bloodGroup})</h3>
                   <p className="text-sm text-slate-500">{req.hospitalName} • {req.units} Units</p>
                 </div>
-                <button 
+                <button
                   onClick={() => handleAcceptBlood(req._id)}
                   style={{ background: "linear-gradient(135deg,#e11d48,#db2777)", color: "#fff", padding: "8px 16px", borderRadius: 12, border: "none", fontWeight: 600, cursor: "pointer" }}
                 >
@@ -123,7 +123,7 @@ export default function VolunteerDashboard() {
                   <p className="text-sm text-slate-500">{camp.hospital?.hospitalName} • {new Date(camp.date).toLocaleDateString()}</p>
                   <p className="text-xs text-slate-400">{camp.location}</p>
                 </div>
-                <button 
+                <button
                   onClick={() => handleJoinCamp(camp._id)}
                   style={{ background: "#3b82f6", color: "#fff", padding: "8px 16px", borderRadius: 12, border: "none", fontWeight: 600, cursor: "pointer" }}
                 >

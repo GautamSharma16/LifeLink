@@ -57,6 +57,13 @@ export const acceptBloodRequest = async (req, res, next) => {
       message: `Your request was accepted by ${req.user.name}.`,
       type: "blood",
     });
+    await Notification.create({
+      user: req.user._id,
+      title: "You accepted a blood request",
+      message: `You accepted ${request.patientName}'s request at ${request.hospitalName}.`,
+      type: "blood",
+    });
+
     req.io.emit("blood_request_accepted", request);
     return res.json({ success: true, data: request });
   } catch (error) {

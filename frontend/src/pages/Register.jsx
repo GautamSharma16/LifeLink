@@ -43,23 +43,23 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
-      const payload = { 
+      const payload = {
         name, email, password, phone, address, city, role,
         ...(role === "user" || role === "volunteer" ? { bloodGroup } : {}),
         ...(role === "hospital" ? { hospitalName, availableBeds: Number(availableBeds) || 0, icuBeds: Number(icuBeds) || 0, oxygenCylinders: Number(oxygenCylinders) || 0 } : {}),
         ...(role === "ambulance_driver" ? { vehicleNumber } : {})
       };
       const res = await api.post('/auth/register', payload);
-      
+
       if (res.data.success) {
         const successMessage = document.createElement('div');
         successMessage.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-slide-in';
         successMessage.textContent = res.data.message;
         document.body.appendChild(successMessage);
         setTimeout(() => successMessage.remove(), 3000);
-        
+
         setTimeout(() => navigate('/login'), 1500);
       } else {
         alert(res.data.message);
@@ -97,7 +97,7 @@ const Register = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-pink-50 dark:from-slate-950 dark:via-slate-900 dark:to-rose-950 flex overflow-hidden font-sans">
-      <motion.div 
+      <motion.div
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.8 }}
@@ -117,8 +117,8 @@ const Register = () => {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
         </motion.div>
-        
-        <motion.div 
+
+        <motion.div
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.8 }}
@@ -135,13 +135,13 @@ const Register = () => {
         </motion.div>
       </motion.div>
 
-      <motion.div 
+      <motion.div
         initial={{ x: 100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.8 }}
         className="w-full lg:w-1/2 flex items-center justify-center p-8 overflow-y-auto"
       >
-        <motion.div 
+        <motion.div
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.6 }}
@@ -260,7 +260,7 @@ const Register = () => {
                     </div>
                   )}
                 </div>
-                
+
                 <div className="flex gap-3 mt-6">
                   <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} type="button" onClick={prevStep} className="flex-1 bg-slate-100 text-slate-700 font-bold py-3.5 rounded-xl">Back</motion.button>
                   <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} type="submit" disabled={isLoading} className="flex-[2] bg-gradient-to-r from-rose-500 to-pink-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-rose-500/30">

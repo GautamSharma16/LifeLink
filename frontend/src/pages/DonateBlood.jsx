@@ -232,7 +232,7 @@ export default function DonateBlood() {
             ].map(stat => (
               <div key={stat.label} style={{ textAlign: "center" }}>
                 <div style={{ fontSize: "clamp(1.5rem, 4vw, 2rem)", fontWeight: 800, color: "#fda4af" }}>{stat.value}</div>
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}>{stat.label}</div>
+                <div style={{ fontSize: 13, color: "pink" }}>{stat.label}</div>
               </div>
             ))}
           </div>
@@ -483,7 +483,7 @@ export default function DonateBlood() {
           gap: 32,
           alignItems: "start"
         }}>
-        <style>{`
+          <style>{`
           @media (max-width: 1100px) {
             .main-content-grid {
               grid-template-columns: 1fr !important;
@@ -789,7 +789,7 @@ export default function DonateBlood() {
                     backdropFilter: "blur(10px)"
                   }}>
                     <div style={{ fontSize: 24, fontWeight: 800, color: "#fda4af" }}>342</div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>Lives Saved</div>
+                    <div style={{ fontSize: 11, color: "#cbd5e1" }}>Lives Saved</div>
                   </div>
                   <div style={{
                     flex: 1,
@@ -800,7 +800,7 @@ export default function DonateBlood() {
                     backdropFilter: "blur(10px)"
                   }}>
                     <div style={{ fontSize: 24, fontWeight: 800, color: "#fda4af" }}>12k+</div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>Active Donors</div>
+                    <div style={{ fontSize: 11, color: "#cbd5e1" }}>Active Donors</div>
                   </div>
                 </div>
               </div>

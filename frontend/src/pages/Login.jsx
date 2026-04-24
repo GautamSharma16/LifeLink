@@ -31,11 +31,11 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
       const payload = { email, password };
       const res = await api.post('/auth/login', payload);
-      
+
       if (res.data.success) {
         // Show success message with animation
         const successMessage = document.createElement('div');
@@ -46,7 +46,7 @@ const Login = () => {
 
         localStorage.setItem("lifelink_token", res.data.data.token);
         localStorage.setItem("lifelink_user", JSON.stringify(res.data.data.user));
-        
+
         setTimeout(() => navigate('/'), 1500);
       } else {
         alert(res.data.message);
@@ -66,7 +66,7 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-pink-50 dark:from-slate-950 dark:via-slate-900 dark:to-rose-950 flex overflow-hidden">
       {/* Left Side - Image Slider with Animation */}
-      <motion.div 
+      <motion.div
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.8 }}
@@ -89,9 +89,9 @@ const Login = () => {
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
           </motion.div>
         </AnimatePresence>
-        
+
         {/* Overlay Content */}
-        <motion.div 
+        <motion.div
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.8 }}
@@ -116,29 +116,28 @@ const Login = () => {
             </div>
           </div>
         </motion.div>
-        
+
         {/* Image Indicators */}
         <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 z-20">
           {images.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentImageIndex(idx)}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                idx === currentImageIndex ? 'bg-white w-6' : 'bg-white/50'
-              }`}
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${idx === currentImageIndex ? 'bg-white w-6' : 'bg-white/50'
+                }`}
             />
           ))}
         </div>
       </motion.div>
 
       {/* Right Side - Login Form */}
-      <motion.div 
+      <motion.div
         initial={{ x: 100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.8 }}
         className="w-full lg:w-1/2 flex items-center justify-center p-8"
       >
-        <motion.div 
+        <motion.div
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.6 }}
@@ -157,7 +156,7 @@ const Login = () => {
           </div>
 
           {/* Form */}
-          <motion.form 
+          <motion.form
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}

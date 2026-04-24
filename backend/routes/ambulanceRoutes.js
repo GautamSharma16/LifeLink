@@ -1,5 +1,5 @@
 import express from "express";
-import { protect } from "../middlewares/auth.js";
+import { protect } from "../middleware/authMiddleware.js";
 import { 
   createAmbulanceRequest, 
   getAmbulanceRequests, 

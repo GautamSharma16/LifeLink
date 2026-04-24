@@ -1,388 +1,315 @@
-import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
-/* ─── Animated Counter ──────────────────────────────────────────────── */
 const AnimatedCounter = ({ target, suffix = "+" }) => {
   const [count, setCount] = useState(0);
   const ref = useRef(null);
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries[0].isIntersecting) return;
-        let current = 0;
-        const duration = 2000;
-        const increment = target / (duration / 16);
-        const timer = setInterval(() => {
-          current += increment;
-          if (current >= target) { setCount(target); clearInterval(timer); }
-          else setCount(Math.floor(current));
-        }, 16);
-        observer.disconnect();
-      },
-      { threshold: 0.4 }
-    );
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries[0].isIntersecting) return;
+      let current = 0;
+      const increment = target / (1800 / 16);
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) { setCount(target); clearInterval(timer); }
+        else setCount(Math.floor(current));
+      }, 16);
+      observer.disconnect();
+    }, { threshold: 0.4 });
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, [target]);
   return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
 };
 
-/* ─── Scroll Reveal ─────────────────────────────────────────────────── */
 const Reveal = ({ children, delay = 0, direction = "up" }) => {
   const variants = {
-    up:    { hidden: { opacity: 0, y: 40 },   visible: { opacity: 1, y: 0 } },
-    left:  { hidden: { opacity: 0, x: -40 },  visible: { opacity: 1, x: 0 } },
-    right: { hidden: { opacity: 0, x: 40 },   visible: { opacity: 1, x: 0 } },
-    scale: { hidden: { opacity: 0, scale: 0.9 }, visible: { opacity: 1, scale: 1 } },
+    up:    { hidden: { opacity: 0, y: 50 }, visible: { opacity: 1, y: 0 } },
+    left:  { hidden: { opacity: 0, x: -50 }, visible: { opacity: 1, x: 0 } },
+    right: { hidden: { opacity: 0, x: 50 }, visible: { opacity: 1, x: 0 } },
+    scale: { hidden: { opacity: 0, scale: 0.88 }, visible: { opacity: 1, scale: 1 } },
   };
   return (
-    <motion.div
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
-      variants={variants[direction]}
-    >
+    <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }} variants={variants[direction]}>
       {children}
     </motion.div>
   );
 };
 
-/* ─── Parallax Image ────────────────────────────────────────────────── */
-const ParallaxImage = ({ src, alt, className }) => {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], ["-12%", "12%"]);
-  return (
-    <div ref={ref} className={`overflow-hidden ${className}`}>
-      <motion.img src={src} alt={alt} style={{ y }} className="w-full h-full object-cover scale-125" />
-    </div>
-  );
-};
-
-/* ─── Floating Badge ────────────────────────────────────────────────── */
-const FloatingBadge = ({ icon, label, value, delay, className }) => (
-  <motion.div
-    initial={{ opacity: 0, scale: 0.7, y: 20 }}
-    animate={{ opacity: 1, scale: 1, y: 0 }}
-    transition={{ delay, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-    className={`absolute z-20 flex items-center gap-2 rounded-2xl bg-white/95 px-4 py-2.5 shadow-2xl backdrop-blur dark:bg-slate-900/95 ${className}`}
-  >
-    <span className="text-xl">{icon}</span>
-    <div>
-      <p className="text-xs font-semibold text-slate-400">{label}</p>
-      <p className="text-sm font-black text-slate-800 dark:text-white">{value}</p>
-    </div>
-  </motion.div>
-);
-
-/* ─── Testimonial Card ──────────────────────────────────────────────── */
 const testimonials = [
-  { name: "Neha R.", city: "Delhi", quote: "LifeLink found a rare AB- donor in under 8 minutes. I can't thank them enough.", avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&q=80" },
-  { name: "Arjun S.", city: "Mumbai", quote: "The hospital coordination feature saved us hours of phone calls during a critical moment.", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&q=80" },
-  { name: "Priya M.", city: "Bangalore", quote: "As a volunteer, the platform makes it so easy to know exactly where I'm needed.", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&q=80" },
+  { name: "Neha R.", city: "Delhi", quote: "LifeLink found a rare AB- donor in under 8 minutes. I can't thank them enough.", avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&h=80&fit=crop" },
+  { name: "Arjun S.", city: "Mumbai", quote: "The hospital coordination feature saved us hours of phone calls during a critical moment.", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop" },
+  { name: "Priya M.", city: "Bangalore", quote: "As a volunteer, the platform makes it so easy to know exactly where I'm needed.", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop" },
 ];
 
-/* ─── Main Component ────────────────────────────────────────────────── */
 export default function Home() {
   const { scrollYProgress } = useScroll();
-  const scaleHero = useTransform(scrollYProgress, [0, 0.25], [1, 0.96]);
-  const opacityHero = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const heroY = useTransform(scrollYProgress, [0, 0.4], ["0%", "25%"]);
+  const [activeTest, setActiveTest] = useState(0);
 
   useEffect(() => {
-    const t = setInterval(() => setActiveTestimonial(p => (p + 1) % testimonials.length), 4000);
+    const t = setInterval(() => setActiveTest(p => (p + 1) % testimonials.length), 4500);
     return () => clearInterval(t);
   }, []);
 
-  const stats = [
-    { label: "Active Donors", value: 12456, suffix: "+", icon: "🩸", accent: "from-rose-500 to-pink-600", bg: "bg-rose-50 dark:bg-rose-950/30" },
-    { label: "Emergency Cases", value: 1820, suffix: "+", icon: "🚑", accent: "from-amber-500 to-orange-600", bg: "bg-amber-50 dark:bg-amber-950/30" },
-    { label: "Partner Hospitals", value: 326, suffix: "", icon: "🏥", accent: "from-blue-500 to-cyan-600", bg: "bg-blue-50 dark:bg-blue-950/30" },
-    { label: "Volunteers", value: 5340, suffix: "+", icon: "🤝", accent: "from-violet-500 to-purple-600", bg: "bg-violet-50 dark:bg-violet-950/30" },
-  ];
-
-  const galleryImages = [
-    { src: "https://images.unsplash.com/photo-1615461066841-6116e61058f4?w=600&q=80", label: "Blood Donation Drive" },
-    { src: "https://images.unsplash.com/photo-1516549655169-df83a0774514?w=600&q=80", label: "Emergency Response Team" },
-    { src: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&q=80", label: "Hospital Coordination" },
-    { src: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=600&q=80", label: "Volunteer Network" },
-  ];
-
   return (
-    <div className="min-h-screen bg-[#F8F4F0] text-slate-800 dark:bg-[#0D0D0F] dark:text-slate-200 font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-[#080810] text-white overflow-x-hidden">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700;800;900&display=swap');
-        .font-display { font-family: 'Instrument Serif', serif; }
-        .font-body { font-family: 'DM Sans', sans-serif; }
-        * { font-family: 'DM Sans', sans-serif; }
-        .noise::after {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-          pointer-events: none;
-        }
-        .glow-red { box-shadow: 0 0 80px rgba(239,68,68,0.25); }
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Syne:wght@400;500;600;700;800&display=swap');
+        .font-display { font-family: 'Cormorant Garamond', serif; }
+        * { font-family: 'Syne', sans-serif; }
+        .text-gradient { background: linear-gradient(135deg, #ff6b6b, #ee0979, #ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .card-glass { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(20px); }
+        .hero-glow { background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(220,38,38,0.25) 0%, transparent 70%); }
       `}</style>
 
-      <div className="mx-auto max-w-7xl px-4 md:px-8">
-
-        {/* ── HERO ── */}
-        <motion.section
-          style={{ scale: scaleHero }}
-          className="relative mt-6 overflow-hidden rounded-[2.5rem] noise"
-        >
-          {/* Background with layered images */}
-          <div className="absolute inset-0">
-            <img
-              src="https://images.unsplash.com/photo-1584515933487-779824d29309?w=1600&q=80"
-              alt="hero bg"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-br from-rose-700/90 via-red-800/85 to-slate-900/95" />
-          </div>
-
-          {/* Animated orbs */}
-          <motion.div
-            animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.5, 0.3] }}
-            transition={{ duration: 6, repeat: Infinity }}
-            className="absolute -top-20 -right-20 h-96 w-96 rounded-full bg-pink-500/30 blur-3xl"
+      {/* ── Hero Section ── */}
+      {/* FIX: Changed min-h-screen to h-screen so it fits exactly one viewport,
+          and replaced pt-32 with items-center so content is vertically centred
+          relative to the full screen height — no extra top gap vs the navbar. */}
+      <section className="relative h-screen flex items-center overflow-hidden">
+        <motion.div style={{ y: heroY }} className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1584515933487-779824d29309?w=1800&h=1000&fit=crop"
+            alt=""
+            className="w-full h-full object-cover scale-110"
           />
-          <motion.div
-            animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
-            transition={{ duration: 8, repeat: Infinity, delay: 2 }}
-            className="absolute -bottom-20 -left-10 h-80 w-80 rounded-full bg-orange-500/25 blur-3xl"
-          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-[#080810]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-black/20" />
+        </motion.div>
+        <div className="hero-glow absolute inset-0" />
 
-          <div className="relative px-8 py-16 md:px-16 md:py-20">
-            <div className="grid items-center gap-12 md:grid-cols-[1.1fr_0.9fr]">
-              <div className="space-y-7 text-white">
-                <motion.div
-                  initial={{ opacity: 0, x: -30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.7 }}
-                  className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-semibold backdrop-blur"
-                >
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-300 opacity-75" />
-                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-rose-400" />
-                  </span>
-                  24/7 Emergency Coordination Platform
-                </motion.div>
+        <motion.div
+          animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.4, 0.2] }}
+          transition={{ duration: 7, repeat: Infinity }}
+          className="absolute top-20 right-1/4 h-96 w-96 rounded-full bg-red-600/20 blur-3xl pointer-events-none"
+        />
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.3, 0.15] }}
+          transition={{ duration: 9, repeat: Infinity, delay: 2 }}
+          className="absolute bottom-40 left-1/3 h-80 w-80 rounded-full bg-pink-600/15 blur-3xl pointer-events-none"
+        />
 
-                <motion.h1
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.1 }}
-                  className="font-display text-5xl font-bold leading-[1.1] md:text-7xl"
-                >
-                  One network.<br />
-                  <span className="italic text-rose-300">Every lifeline.</span>
-                </motion.h1>
-
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7, delay: 0.2 }}
-                  className="max-w-xl text-base leading-7 text-white/80 md:text-lg"
-                >
-                  Blood. Ambulance. Hospital. Volunteer. LifeLink brings every critical service together so families can act fast when every second counts.
-                </motion.p>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7, delay: 0.3 }}
-                  className="flex flex-wrap gap-4"
-                >
-                  <Link
-                    to="/services"
-                    className="group relative overflow-hidden rounded-2xl bg-white px-7 py-3.5 font-bold text-rose-700 shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl"
-                  >
-                    <motion.span className="absolute inset-0 bg-rose-50 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <span className="relative">Explore Services →</span>
-                  </Link>
-                  <Link
-                    to="/contact"
-                    className="rounded-2xl border border-white/30 bg-white/10 px-7 py-3.5 font-semibold text-white backdrop-blur transition-all hover:-translate-y-1 hover:bg-white/20"
-                  >
-                    Contact Us
-                  </Link>
-                </motion.div>
-              </div>
-
-              {/* Right: image mosaic with floating badges */}
-              <div className="relative hidden md:block">
-                <div className="grid grid-cols-2 gap-3">
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="col-span-2 h-48 overflow-hidden rounded-3xl"
-                  >
-                    <motion.img
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ duration: 0.4 }}
-                      src="https://images.unsplash.com/photo-1615461066841-6116e61058f4?w=700&q=80"
-                      alt="Blood donation"
-                      className="w-full h-full object-cover"
-                    />
-                  </motion.div>
-                  {["https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=400&q=80",
-                    "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=400&q=80"].map((src, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.5 + i * 0.1 }}
-                      className="h-36 overflow-hidden rounded-2xl"
-                    >
-                      <motion.img
-                        whileHover={{ scale: 1.08 }}
-                        transition={{ duration: 0.4 }}
-                        src={src}
-                        alt="healthcare"
-                        className="w-full h-full object-cover"
-                      />
-                    </motion.div>
-                  ))}
-                </div>
-
-                <FloatingBadge icon="🩸" label="Matching now" value="Rare B- found" delay={0.8} className="-left-8 top-10" />
-                <FloatingBadge icon="🚑" label="ETA" value="4 minutes" delay={1.0} className="-bottom-4 right-4" />
-              </div>
-            </div>
-          </div>
-        </motion.section>
-
-        {/* ── STATS ── */}
-        <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat, i) => (
-            <Reveal key={stat.label} delay={i * 0.1}>
+        {/* FIX: Removed pt-32 pb-20 — content now centres naturally inside h-screen */}
+        <div className="relative w-full px-6 md:px-12 lg:px-20">
+          <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+            <div className="space-y-8">
               <motion.div
-                whileHover={{ y: -6, scale: 1.02 }}
-                transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                className={`relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-6 shadow-lg dark:border-slate-800 dark:bg-slate-900 ${stat.bg}`}
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
+                className="inline-flex items-center gap-3 rounded-full border border-red-500/30 bg-red-500/10 px-5 py-2.5 text-sm font-medium text-red-300"
               >
-                <div className={`absolute -right-4 -top-4 h-20 w-20 rounded-full bg-gradient-to-br ${stat.accent} opacity-10 blur-xl`} />
-                <span className="text-3xl">{stat.icon}</span>
-                <p className={`mt-4 bg-gradient-to-r ${stat.accent} bg-clip-text text-4xl font-black text-transparent`}>
-                  <AnimatedCounter target={stat.value} suffix={stat.suffix} />
-                </p>
-                <p className="mt-1.5 text-sm font-semibold text-slate-500 dark:text-slate-400">{stat.label}</p>
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+                  <span className="relative h-2 w-2 rounded-full bg-red-400" />
+                </span>
+                24/7 Emergency Coordination Platform
               </motion.div>
+
+              <motion.h1
+                initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+                className="font-display text-6xl md:text-8xl font-bold leading-[0.95]"
+              >
+                One network.<br /><em className="text-gradient not-italic">Every lifeline.</em>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.7 }}
+                className="text-lg text-white/60 leading-8 max-w-lg"
+              >
+                Blood. Ambulance. Hospital. Volunteer. LifeLink unifies every critical service so families can act in seconds, not hours.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
+                className="flex flex-wrap gap-4"
+              >
+                <Link
+                  to="/services"
+                  className="group relative overflow-hidden rounded-full bg-red-600 px-8 py-4 font-semibold text-white shadow-[0_0_40px_rgba(220,38,38,0.4)] transition-all hover:shadow-[0_0_60px_rgba(220,38,38,0.6)] hover:-translate-y-0.5"
+                >
+                  Explore Services →
+                </Link>
+                <Link
+                  to="/contact"
+                  className="rounded-full border border-white/20 bg-white/5 px-8 py-4 font-semibold text-white backdrop-blur transition hover:bg-white/10 hover:-translate-y-0.5"
+                >
+                  Contact Us
+                </Link>
+              </motion.div>
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5, duration: 0.9 }}
+              className="hidden md:grid grid-cols-2 gap-3"
+            >
+              {[
+                { v: "12k+", l: "Active Donors",  i: "🩸", c: "border-red-500/20 bg-red-500/5" },
+                { v: "9 min", l: "Avg Response",  i: "⚡", c: "border-amber-500/20 bg-amber-500/5" },
+                { v: "320+", l: "Hospitals",       i: "🏥", c: "border-blue-500/20 bg-blue-500/5" },
+                { v: "24/7", l: "Dispatch",        i: "🚑", c: "border-emerald-500/20 bg-emerald-500/5" },
+              ].map(({ v, l, i, c }) => (
+                <motion.div
+                  key={l} whileHover={{ scale: 1.04, y: -4 }} transition={{ type: "spring", stiffness: 400 }}
+                  className={`rounded-3xl border p-6 backdrop-blur ${c}`}
+                >
+                  <p className="text-2xl mb-3">{i}</p>
+                  <p className="text-4xl font-bold font-display">{v}</p>
+                  <p className="text-sm text-white/50 mt-1">{l}</p>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* Scroll indicator */}
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }}
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/30"
+          >
+            <p className="text-xs tracking-[0.3em] uppercase">Scroll</p>
+            <motion.div
+              animate={{ y: [0, 8, 0] }} transition={{ duration: 1.5, repeat: Infinity }}
+              className="w-px h-8 bg-gradient-to-b from-white/40 to-transparent"
+            />
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── Stats Bar ── */}
+      <section className="w-full border-y border-white/5 bg-white/[0.02]">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20 py-10 grid grid-cols-2 md:grid-cols-4 gap-8">
+          {[
+            { label: "Active Donors",    value: 12456, suffix: "+", color: "text-red-400" },
+            { label: "Emergency Cases",  value: 1820,  suffix: "+", color: "text-amber-400" },
+            { label: "Partner Hospitals",value: 326,   suffix: "",  color: "text-blue-400" },
+            { label: "Volunteers Active",value: 5340,  suffix: "+", color: "text-emerald-400" },
+          ].map((s, i) => (
+            <Reveal key={s.label} delay={i * 0.1}>
+              <div className="text-center md:text-left">
+                <p className={`text-4xl font-bold font-display ${s.color}`}>
+                  <AnimatedCounter target={s.value} suffix={s.suffix} />
+                </p>
+                <p className="text-sm text-white/40 mt-2 tracking-wide">{s.label}</p>
+              </div>
             </Reveal>
           ))}
-        </section>
+        </div>
+      </section>
 
-        {/* ── GALLERY STRIP ── */}
-        <Reveal delay={0.1}>
-          <section className="mt-10">
-            <div className="mb-5 flex items-center justify-between">
-              <h2 className="font-display text-3xl font-bold">Our work in action</h2>
-              <Link to="/about" className="text-sm font-semibold text-rose-500 hover:underline">View all →</Link>
+      {/* ── Image Strip ── */}
+      {/* FIX: All four images now share a fixed uniform height (h-64 md:h-72).
+          Removed the alternating h-80/h-48 sizing that made images uneven. */}
+      <Reveal delay={0.1}>
+        <section className="w-full px-6 md:px-12 lg:px-20 py-20">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-end justify-between mb-8">
+              <h2 className="font-display text-4xl md:text-5xl font-bold">
+                Our work<br /><em className="text-white/40">in action</em>
+              </h2>
+              <Link to="/about" className="text-sm text-red-400 hover:text-red-300 transition border-b border-red-400/30 pb-0.5">
+                View all →
+              </Link>
             </div>
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-              {galleryImages.map((img, i) => (
+
+            {/* FIX: Uniform grid — all cells same height, overflow hidden clips images cleanly */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {[
+                { src: "https://images.unsplash.com/photo-1615461066841-6116e61058f4?w=600&h=400&fit=crop", label: "Blood Donation Drive" },
+                { src: "https://images.unsplash.com/photo-1516549655169-df83a0774514?w=600&h=400&fit=crop", label: "Emergency Response" },
+                { src: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&h=400&fit=crop", label: "Hospital Coordination" },
+                { src: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=600&h=400&fit=crop", label: "Volunteer Network" },
+              ].map((img, i) => (
                 <motion.div
-                  key={i}
-                  whileHover={{ scale: 1.03 }}
-                  transition={{ duration: 0.3 }}
-                  className="group relative h-48 overflow-hidden rounded-2xl"
+                  key={i} whileHover={{ scale: 1.02 }} transition={{ duration: 0.4 }}
+                  className="group relative overflow-hidden rounded-2xl h-64 md:h-72"
                 >
-                  <img src={img.src} alt={img.label} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                  <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent p-4 opacity-0 transition-opacity group-hover:opacity-100">
-                    <span className="text-sm font-semibold text-white">{img.label}</span>
+                  <img
+                    src={img.src} alt={img.label}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                    <p className="text-sm font-semibold text-white">{img.label}</p>
                   </div>
                 </motion.div>
               ))}
             </div>
-          </section>
-        </Reveal>
-
-        {/* ── PILLARS ── */}
-        <section className="mt-10 grid gap-6 md:grid-cols-3">
-          {[
-            {
-              title: "Blood matching in minutes",
-              description: "Find verified donors nearby and reduce the delay between request, response, and hospital coordination.",
-              img: "https://images.unsplash.com/photo-1615461066841-6116e61058f4?w=600&q=80",
-              color: "from-rose-500 to-pink-600",
-            },
-            {
-              title: "Emergency transport support",
-              description: "Connect patients with ambulance teams and monitor the response path with better visibility.",
-              img: "https://images.unsplash.com/photo-1516549655169-df83a0774514?w=600&q=80",
-              color: "from-orange-500 to-red-600",
-            },
-            {
-              title: "Hospital coordination",
-              description: "Help families identify hospitals, departments, and next steps without starting from zero every time.",
-              img: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&q=80",
-              color: "from-blue-500 to-cyan-600",
-            },
-          ].map((pillar, i) => (
-            <Reveal key={pillar.title} delay={i * 0.12} direction="up">
-              <motion.article
-                whileHover={{ y: -8 }}
-                transition={{ type: "spring", stiffness: 300 }}
-                className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg dark:border-slate-800 dark:bg-slate-900"
-              >
-                <div className="h-48 overflow-hidden">
-                  <motion.img
-                    whileHover={{ scale: 1.08 }}
-                    transition={{ duration: 0.5 }}
-                    src={pillar.img}
-                    alt={pillar.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className={`absolute top-0 left-0 right-0 h-48 bg-gradient-to-b ${pillar.color} opacity-40 mix-blend-multiply`} />
-                </div>
-                <div className="p-7">
-                  <h2 className="text-xl font-bold">{pillar.title}</h2>
-                  <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{pillar.description}</p>
-                  <motion.div
-                    initial={{ width: 0 }}
-                    whileInView={{ width: "40%" }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.5 + i * 0.1, duration: 0.8 }}
-                    className={`mt-5 h-1 rounded-full bg-gradient-to-r ${pillar.color}`}
-                  />
-                </div>
-              </motion.article>
-            </Reveal>
-          ))}
+          </div>
         </section>
+      </Reveal>
 
-        {/* ── HOW IT WORKS + TRUST ── */}
-        <section className="mt-10 grid gap-6 md:grid-cols-[1fr_0.95fr]">
+      {/* ── Services Section ── */}
+      <section className="w-full px-6 md:px-12 lg:px-20 py-10">
+        <div className="max-w-7xl mx-auto">
+          <Reveal>
+            <div className="mb-12">
+              <p className="text-red-400 text-xs tracking-[0.3em] uppercase mb-4">What We Do</p>
+              <h2 className="font-display text-5xl md:text-6xl font-bold leading-tight">
+                Everything for<br /><em className="text-white/40">emergency response</em>
+              </h2>
+            </div>
+          </Reveal>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { title: "Blood Matching",      desc: "Find verified donors nearby and reduce delays between request, response, and hospital coordination.", img: "https://images.unsplash.com/photo-1615461066841-6116e61058f4?w=600&h=350&fit=crop", color: "#ef4444", icon: "🩸" },
+              { title: "Emergency Transport", desc: "Connect patients with ambulance teams and monitor response with better visibility.",                    img: "https://images.unsplash.com/photo-1516549655169-df83a0774514?w=600&h=350&fit=crop", color: "#f59e0b", icon: "🚑" },
+              { title: "Hospital Network",    desc: "Help families identify hospitals, departments, and next steps without starting from zero.",            img: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&h=350&fit=crop", color: "#3b82f6", icon: "🏥" },
+            ].map((s, i) => (
+              <Reveal key={s.title} delay={i * 0.1}>
+                <motion.article
+                  whileHover={{ y: -8 }} transition={{ type: "spring", stiffness: 300 }}
+                  className="group relative overflow-hidden rounded-3xl card-glass cursor-pointer"
+                >
+                  <div className="h-52 overflow-hidden">
+                    <img src={s.img} alt={s.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#080810] via-black/20 to-transparent" />
+                  </div>
+                  <div className="p-7">
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="text-2xl">{s.icon}</span>
+                      <h3 className="text-xl font-bold">{s.title}</h3>
+                    </div>
+                    <p className="text-sm text-white/50 leading-7">{s.desc}</p>
+                    <div className="mt-5 h-px w-0 group-hover:w-full transition-all duration-700" style={{ background: `linear-gradient(90deg, ${s.color}, transparent)` }} />
+                  </div>
+                </motion.article>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── How It Works + Testimonials ── */}
+      <section className="w-full px-6 md:px-12 lg:px-20 py-20">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8">
           <Reveal direction="left">
-            <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-lg dark:border-slate-800 dark:bg-slate-900 h-full">
-              <span className="text-xs font-bold uppercase tracking-widest text-rose-500">How it works</span>
-              <h2 className="font-display mt-3 text-3xl font-bold">A calmer process<br />during critical moments</h2>
-              <div className="mt-8 space-y-4">
+            <div className="rounded-3xl card-glass p-10 h-full">
+              <p className="text-red-400 text-xs tracking-[0.3em] uppercase mb-6">How It Works</p>
+              <h2 className="font-display text-4xl font-bold mb-10">
+                A calmer process<br /><em className="text-white/40">in critical moments</em>
+              </h2>
+              <div className="space-y-5">
                 {[
-                  { step: "01", title: "Create a request", desc: "A patient or family member submits the key emergency details in seconds.", img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80" },
-                  { step: "02", title: "Surface nearby support", desc: "LifeLink identifies the most relevant donors, hospitals, and responders.", img: "https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=200&q=80" },
-                  { step: "03", title: "Stay informed", desc: "Families and response teams get clear, live status throughout the process.", img: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=200&q=80" },
+                  { step: "01", title: "Create a request",      desc: "Submit key emergency details in seconds from any device.",                                    img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=150&fit=crop" },
+                  { step: "02", title: "Surface nearby support", desc: "LifeLink identifies the most relevant donors, hospitals, and responders.",                    img: "https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=200&h=150&fit=crop" },
+                  { step: "03", title: "Stay informed",          desc: "Families and response teams get live status throughout the process.",                         img: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=200&h=150&fit=crop" },
                 ].map((item, i) => (
                   <motion.div
                     key={item.step}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.15 }}
-                    whileHover={{ x: 4 }}
-                    className="flex gap-4 rounded-2xl bg-slate-50 p-4 dark:bg-slate-800/60"
+                    initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }} transition={{ delay: i * 0.15 }} whileHover={{ x: 5 }}
+                    className="flex gap-4 rounded-2xl bg-white/5 p-4 border border-white/5 hover:border-red-500/20 transition-colors"
                   >
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-rose-500 font-black text-white text-sm">{item.step}</div>
-                    <div className="flex-1">
-                      <p className="font-bold">{item.title}</p>
-                      <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">{item.desc}</p>
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-red-600/20 text-red-400 font-bold text-sm border border-red-500/20">
+                      {item.step}
                     </div>
-                    <img src={item.img} alt="" className="h-12 w-12 shrink-0 rounded-xl object-cover" />
+                    <div className="flex-1">
+                      <p className="font-semibold">{item.title}</p>
+                      <p className="mt-1 text-sm text-white/40">{item.desc}</p>
+                    </div>
+                    <img src={item.img} alt="" className="h-12 w-12 shrink-0 rounded-xl object-cover opacity-70" />
                   </motion.div>
                 ))}
               </div>
@@ -391,88 +318,84 @@ export default function Home() {
 
           <Reveal direction="right" delay={0.1}>
             <div className="flex flex-col gap-6 h-full">
-              {/* Testimonial carousel */}
-              <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-lg dark:border-slate-800 dark:bg-slate-900 flex-1">
-                <span className="text-xs font-bold uppercase tracking-widest text-emerald-500">What people say</span>
-                <h2 className="font-display mt-3 text-2xl font-bold">Real stories, real impact</h2>
-                <div className="mt-6 relative h-36">
+              <div className="rounded-3xl card-glass p-8 flex-1 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-red-600/5 rounded-full blur-3xl" />
+                <p className="text-white/30 text-xs tracking-[0.3em] uppercase mb-6">What People Say</p>
+                <div className="relative h-44">
                   <AnimatePresence mode="wait">
-                    {testimonials.map((t, i) =>
-                      i === activeTestimonial ? (
-                        <motion.div
-                          key={t.name}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -20 }}
-                          transition={{ duration: 0.5 }}
-                          className="absolute inset-0"
-                        >
-                          <p className="text-sm leading-7 text-slate-600 dark:text-slate-300 italic">"{t.quote}"</p>
-                          <div className="mt-4 flex items-center gap-3">
-                            <img src={t.avatar} alt={t.name} className="h-10 w-10 rounded-full object-cover" />
-                            <div>
-                              <p className="text-sm font-bold">{t.name}</p>
-                              <p className="text-xs text-slate-400">{t.city}</p>
-                            </div>
+                    {testimonials.map((t, i) => i === activeTest ? (
+                      <motion.div
+                        key={t.name}
+                        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.5 }} className="absolute inset-0"
+                      >
+                        <p className="font-display text-2xl italic text-white/80 leading-relaxed">"{t.quote}"</p>
+                        <div className="mt-6 flex items-center gap-3">
+                          <img src={t.avatar} alt={t.name} className="h-10 w-10 rounded-full object-cover ring-2 ring-red-500/30" />
+                          <div>
+                            <p className="font-semibold text-sm">{t.name}</p>
+                            <p className="text-xs text-white/40">{t.city}</p>
                           </div>
-                        </motion.div>
-                      ) : null
-                    )}
+                        </div>
+                      </motion.div>
+                    ) : null)}
                   </AnimatePresence>
                 </div>
-                <div className="mt-4 flex gap-2">
+                <div className="flex gap-2 mt-4">
                   {testimonials.map((_, i) => (
-                    <button key={i} onClick={() => setActiveTestimonial(i)}
-                      className={`h-1.5 rounded-full transition-all ${i === activeTestimonial ? "w-8 bg-rose-500" : "w-2 bg-slate-200 dark:bg-slate-700"}`}
+                    <button
+                      key={i} onClick={() => setActiveTest(i)}
+                      className={`h-1 rounded-full transition-all duration-300 ${i === activeTest ? "w-8 bg-red-500" : "w-2 bg-white/20"}`}
                     />
                   ))}
                 </div>
               </div>
 
-              {/* CTA */}
-              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-rose-600 to-pink-700 p-7 text-white shadow-xl">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                  className="absolute -right-10 -top-10 h-40 w-40 rounded-full border border-white/10"
-                />
-                <motion.div
-                  animate={{ rotate: -360 }}
-                  transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                  className="absolute -right-5 -top-5 h-24 w-24 rounded-full border border-white/15"
-                />
-                <h3 className="text-xl font-black">Need direct help?</h3>
-                <p className="mt-2 text-sm text-white/80">Our team is available 24/7 for emergency coordination and partnership inquiries.</p>
-                <Link to="/contact" className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-bold text-rose-600 transition hover:-translate-y-0.5">
+              <div className="relative overflow-hidden rounded-3xl p-8" style={{ background: "linear-gradient(135deg, #7f1d1d, #be123c)" }}>
+                <motion.div animate={{ rotate: 360 }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                  className="absolute -right-16 -top-16 h-48 w-48 rounded-full border border-white/10" />
+                <motion.div animate={{ rotate: -360 }} transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+                  className="absolute -right-8 -top-8 h-28 w-28 rounded-full border border-white/15" />
+                <h3 className="text-2xl font-bold relative">Need direct help?</h3>
+                <p className="mt-2 text-sm text-white/70 relative">Our team is available 24/7 for emergency coordination.</p>
+                <Link
+                  to="/contact"
+                  className="mt-6 relative inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold text-red-700 transition hover:-translate-y-0.5 hover:shadow-lg"
+                >
                   Contact Us →
                 </Link>
               </div>
             </div>
           </Reveal>
-        </section>
+        </div>
+      </section>
 
-        {/* ── IMPACT PARALLAX BANNER ── */}
-        <Reveal delay={0.1}>
-          <section className="relative mt-10 h-72 overflow-hidden rounded-3xl md:h-80">
-            <ParallaxImage
-              src="https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=1400&q=80"
-              alt="Team impact"
-              className="absolute inset-0"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 to-rose-900/60" />
-            <div className="relative flex h-full flex-col items-start justify-center px-10">
-              <p className="text-sm font-semibold uppercase tracking-widest text-rose-300">Our impact</p>
-              <h2 className="font-display mt-3 max-w-lg text-4xl font-bold text-white md:text-5xl">Every response begins with one request</h2>
-              <Link to="/services" className="mt-6 rounded-2xl bg-white px-6 py-3 text-sm font-bold text-rose-700 transition hover:-translate-y-1">
+      {/* ── CTA Banner ── */}
+      <Reveal>
+        <section className="relative w-full overflow-hidden" style={{ height: "420px" }}>
+          <img
+            src="https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=1800&h=500&fit=crop"
+            alt="" className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(0,0,0,0.9) 40%, rgba(0,0,0,0.3))" }} />
+          <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-12 lg:px-20">
+            <div className="max-w-7xl mx-auto w-full">
+              <p className="text-red-400 text-xs tracking-[0.3em] uppercase mb-4">Our Impact</p>
+              <h2 className="font-display text-5xl md:text-7xl font-bold leading-tight max-w-2xl">
+                Every response begins with<br /><em>one request.</em>
+              </h2>
+              <Link
+                to="/services"
+                className="mt-8 inline-flex rounded-full bg-red-600 px-8 py-4 font-semibold text-white shadow-[0_0_40px_rgba(220,38,38,0.4)] hover:shadow-[0_0_60px_rgba(220,38,38,0.6)] transition hover:-translate-y-0.5"
+              >
                 See Our Services →
               </Link>
             </div>
-          </section>
-        </Reveal>
+          </div>
+        </section>
+      </Reveal>
 
-        {/* bottom padding */}
-        <div className="h-16" />
-      </div>
+      <div className="h-20" />
     </div>
   );
 }

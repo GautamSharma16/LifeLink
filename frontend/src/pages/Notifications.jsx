@@ -46,7 +46,7 @@ export default function Notifications() {
   };
 
   const getIcon = (type) => {
-    switch(type) {
+    switch (type) {
       case 'blood': return '🩸';
       case 'ambulance': return '🚑';
       case 'camp': return '🏥';
@@ -61,7 +61,7 @@ export default function Notifications() {
           <h1 style={{ fontFamily: "'Instrument Serif', serif", fontSize: 42, fontWeight: 700, margin: 0 }}>Alerts & Notifications</h1>
           <p style={{ color: "#64748b", marginTop: 8 }}>Stay updated with real-time emergency requests and activity.</p>
         </div>
-        <button 
+        <button
           onClick={fetchNotifications}
           style={{ background: "#f1f5f9", border: "none", padding: "10px 16px", borderRadius: 12, fontWeight: 600, cursor: "pointer" }}
         >
@@ -82,7 +82,7 @@ export default function Notifications() {
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ delay: i * 0.05 }}
                 onClick={() => !n.read && markRead(n._id)}
-                style={{ 
+                style={{
                   background: n.read ? "rgba(255,255,255,0.5)" : "#fff",
                   border: `1px solid ${n.read ? "#e2e8f0" : "#e11d4833"}`,
                   borderRadius: 20,
@@ -104,7 +104,7 @@ export default function Notifications() {
                     <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: n.read ? "#64748b" : "#1e293b" }}>{n.title}</h3>
                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                       <span style={{ fontSize: 12, color: "#94a3b8" }}>{new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                      <button 
+                      <button
                         onClick={(e) => deleteNotification(n._id, e)}
                         style={{ background: "transparent", border: "none", cursor: "pointer", color: "#ef4444", padding: 4, borderRadius: 8 }}
                         title="Delete notification"

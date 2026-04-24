@@ -26,7 +26,7 @@ export default function Navbar({ isLoggedIn = false, onLogout }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dark, setDark] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  
+
   const role = isLoggedIn ? getCurrentRole() : null;
   const links = isLoggedIn ? privateLinks.filter(l => l.roles.includes(role)) : publicLinks;
 
