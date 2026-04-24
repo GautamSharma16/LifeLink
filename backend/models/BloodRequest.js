@@ -9,6 +9,8 @@ const bloodRequestSchema = new mongoose.Schema(
     units: { type: Number, required: true, min: 1 },
     hospitalName: { type: String, required: true },
     city: { type: String, required: true, index: true },
+    contactNumber: { type: String, default: "" },
+    additionalNotes: { type: String, default: "" },
     status: { type: String, enum: ["open", "accepted", "completed", "cancelled"], default: "open" },
     emergencyLevel: { type: String, enum: ["low", "medium", "critical"], default: "medium" },
   },

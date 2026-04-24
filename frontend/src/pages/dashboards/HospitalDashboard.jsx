@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../../lib/api";
 import { toast } from "react-hot-toast";
@@ -16,6 +17,7 @@ const Reveal = ({ children, delay = 0 }) => {
 };
 
 export default function HospitalDashboard() {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [beds, setBeds] = useState(0);
   const [requests, setRequests] = useState([]);
@@ -38,7 +40,7 @@ export default function HospitalDashboard() {
 
   const fetchData = async () => {
     try {
-      const uRes = await api.get("/auth/me");
+      const uRes = await api.get("/hospitals/me");
       if (uRes.data.success) {
         setUser(uRes.data.data);
         setBeds(uRes.data.data.availableBeds || 0);
@@ -63,9 +65,10 @@ export default function HospitalDashboard() {
   const updateBeds = async (newBeds) => {
     if (newBeds < 0) return;
     try {
-      const res = await api.put("/auth/update-profile", { availableBeds: newBeds });
+      const res = await api.put("/auth/me", { availableBeds: newBeds });
       if (res.data.success) {
         setBeds(newBeds);
+        setUser((prev) => ({ ...prev, availableBeds: newBeds }));
         toast.success("Beds updated successfully");
       }
     } catch (err) {
@@ -90,7 +93,7 @@ export default function HospitalDashboard() {
   const handleUpdateDetails = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.put("/auth/update-profile", detailsData);
+      const res = await api.put("/auth/me", detailsData);
       if (res.data.success) {
         toast.success("Hospital details updated!");
         setShowDetailsForm(false);
@@ -122,6 +125,14 @@ export default function HospitalDashboard() {
               {user?.hospitalName || "Hospital Admin"}
             </h1>
             <p className="text-white/50 mt-2">Manage resources and coordinate emergency responses</p>
+            {!user?.hospitalRegisteredAt && (
+              <button
+                onClick={() => navigate("/hospital-registration")}
+                className="mt-4 rounded-xl bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/15 transition-all"
+              >
+                Complete hospital registration
+              </button>
+            )}
           </div>
           <div className="flex gap-3">
             <motion.button
@@ -396,7 +407,7 @@ export default function HospitalDashboard() {
           <motion.div
             whileHover={{ y: -4 }}
             className="card-glass rounded-xl p-5 flex items-center gap-4 cursor-pointer"
-            onClick={() => window.location.href = "/blood-requests"}
+            onClick={() => navigate("/request-blood")}
           >
             <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center text-xl">📋</div>
             <div>
@@ -407,7 +418,7 @@ export default function HospitalDashboard() {
           <motion.div
             whileHover={{ y: -4 }}
             className="card-glass rounded-xl p-5 flex items-center gap-4 cursor-pointer"
-            onClick={() => window.location.href = "/hospital-stats"}
+            onClick={() => navigate("/hospitals")}
           >
             <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-xl">📊</div>
             <div>
@@ -418,7 +429,7 @@ export default function HospitalDashboard() {
           <motion.div
             whileHover={{ y: -4 }}
             className="card-glass rounded-xl p-5 flex items-center gap-4 cursor-pointer"
-            onClick={() => window.location.href = "/support"}
+            onClick={() => navigate("/notifications")}
           >
             <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center text-xl">💬</div>
             <div>

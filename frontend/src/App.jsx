@@ -16,6 +16,7 @@ import RoleDashboard from "./pages/RoleDashboard";
 import AmbulancePage from "./pages/Ambulance";
 import DonateBloodPage from "./pages/DonateBlood";
 import HospitalsPage from "./pages/Hospital";
+import HospitalRegistrationPage from "./pages/HospitalRegistration";
 import RequestBloodPage from "./pages/BloodNeed";
 import VolunteersPage from "./pages/Volunteers";
 
@@ -111,6 +112,14 @@ function App() {
         <ProtectedWrapper>
           <Layout>
             <VolunteersPage />
+          </Layout>
+        </ProtectedWrapper>
+      } />
+
+      <Route path="/hospital-registration" element={
+        <ProtectedWrapper>
+          <Layout>
+            <HospitalRegistrationPage />
           </Layout>
         </ProtectedWrapper>
       } />

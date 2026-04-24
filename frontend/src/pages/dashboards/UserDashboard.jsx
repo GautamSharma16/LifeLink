@@ -19,25 +19,34 @@ export default function UserDashboard() {
   const [stats, setStats] = useState({
     totalBloodRequests: 0,
     totalAmbulanceRequests: 0,
+    totalVolunteerRequests: 0,
+    totalDonations: 0,
     openRequests: 0,
-    completedToday: 0
   });
+  const [activity, setActivity] = useState([]);
 
   useEffect(() => {
     const u = localStorage.getItem("lifelink_user");
     if (u) setUser(JSON.parse(u));
 
-    const fetchStats = async () => {
+    const fetchData = async () => {
       try {
-        const res = await api.get("/dashboard/stats");
-        if (res.data.success) {
-          setStats(res.data.data);
+        const [statsRes, activityRes] = await Promise.all([
+          api.get("/dashboard/stats"),
+          api.get("/dashboard/activity"),
+        ]);
+
+        if (statsRes.data.success) {
+          setStats(statsRes.data.data);
+        }
+        if (activityRes.data.success) {
+          setActivity(activityRes.data.data);
         }
       } catch (err) {
-        console.error("Error fetching stats", err);
+        console.error("Error fetching dashboard data", err);
       }
     };
-    fetchStats();
+    fetchData();
   }, []);
 
   return (
@@ -55,8 +64,9 @@ export default function UserDashboard() {
         {[
           { label: "Blood Requests Sent", value: stats.totalBloodRequests, icon: "🩸", color: "#e11d48" },
           { label: "Ambulance Bookings", value: stats.totalAmbulanceRequests, icon: "🚑", color: "#3b82f6" },
-          { label: "Volunteer Requests", value: stats.totalVolunteerRequests || 0, icon: "⏳", color: "#f59e0b" },
-          { label: "Total Donations", value: stats.totalDonations || 0, icon: "✅", color: "#10b981" },
+          { label: "Volunteer Requests", value: stats.totalVolunteerRequests, icon: "🤝", color: "#f59e0b" },
+          { label: "Total Donations", value: stats.totalDonations, icon: "✅", color: "#10b981" },
+          { label: "Open Requests", value: stats.openRequests, icon: "⏳", color: "#8b5cf6" },
         ].map((s, i) => (
           <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
             style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 24, padding: 24, boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)" }}>
@@ -83,13 +93,13 @@ export default function UserDashboard() {
       </div>
 
       <div className="user-dashboard-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 24 }}>
-      <style>{`
-        @media (max-width: 900px) {
-          .user-dashboard-grid {
-            grid-template-columns: 1fr !important;
+        <style>{`
+          @media (max-width: 900px) {
+            .user-dashboard-grid {
+              grid-template-columns: 1fr !important;
+            }
           }
-        }
-      `}</style>
+        `}</style>
         <div style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 24, padding: 24 }}>
           <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 24 }}>Weekly Activity</h2>
           <ResponsiveContainer width="100%" height={260}>
@@ -107,16 +117,15 @@ export default function UserDashboard() {
         <div style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 24, padding: 24 }}>
           <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 16 }}>Recent Activity</h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {[
-              { text: "Blood requested at City Hospital", time: "2h ago", color: "#e11d48" },
-              { text: "Ambulance arrived at location", time: "5h ago", color: "#3b82f6" },
-              { text: "Volunteer accepted request", time: "1d ago", color: "#10b981" }
-            ].map((act, i) => (
-              <div key={i} style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                <div style={{ width: 12, height: 12, borderRadius: "50%", background: act.color }} />
+            {activity.length === 0 && (
+              <p style={{ fontSize: 13, color: "#64748b" }}>No recent activity yet.</p>
+            )}
+            {activity.map((act) => (
+              <div key={act._id} style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#e11d48" }} />
                 <div>
-                  <p style={{ fontSize: 14, fontWeight: 500, color: "#1e293b", margin: 0 }}>{act.text}</p>
-                  <p style={{ fontSize: 12, color: "#64748b", margin: 0 }}>{act.time}</p>
+                  <p style={{ fontSize: 14, fontWeight: 500, color: "#1e293b", margin: 0 }}>{act.title}</p>
+                  <p style={{ fontSize: 12, color: "#64748b", margin: 0 }}>{act.message}</p>
                 </div>
               </div>
             ))}

@@ -25,6 +25,7 @@ export const updateProfileValidation = [
   body("bloodGroup")
     .optional()
     .isIn(["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"]),
+  body("volunteerSkills").optional().isArray(),
 ];
 
 export const register = async (req, res, next) => {
@@ -124,6 +125,12 @@ export const updateProfile = async (req, res, next) => {
       icuBeds: req.body.icuBeds,
       oxygenCylinders: req.body.oxygenCylinders,
       vehicleNumber: req.body.vehicleNumber,
+      volunteerSkills: req.body.volunteerSkills,
+      volunteerAvailability: req.body.volunteerAvailability,
+      volunteerExperience: req.body.volunteerExperience,
+      hospitalDescription: req.body.hospitalDescription,
+      hospitalRegistrationNumber: req.body.hospitalRegistrationNumber,
+      emergencyContact: req.body.emergencyContact,
     };
 
     if (req.body.avatarFile) {

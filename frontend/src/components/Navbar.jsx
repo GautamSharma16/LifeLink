@@ -15,9 +15,10 @@ const privateLinks = [
   { label: "Request", to: "/request-blood", roles: ["user", "hospital", "admin"] },
   { label: "Donate", to: "/donate-blood", roles: ["user", "volunteer", "admin"] },
   { label: "Ambulance", to: "/ambulance", roles: ["user", "ambulance_driver", "hospital", "admin"] },
-  { label: "Hospitals", to: "/hospitals", roles: ["user", "admin"] },
+  { label: "Hospitals", to: "/hospitals", roles: ["user", "hospital", "admin"] },
   { label: "Volunteers", to: "/volunteers", roles: ["user", "volunteer", "admin"] },
   { label: "Alerts", to: "/notifications", roles: ["user", "volunteer", "hospital", "ambulance_driver", "admin"] },
+  { label: "Hospital Setup", to: "/hospital-registration", roles: ["hospital"] },
   { label: "Profile", to: "/profile", roles: ["user", "volunteer", "hospital", "ambulance_driver", "admin"] },
 ];
 

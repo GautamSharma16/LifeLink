@@ -10,6 +10,7 @@ const statusColors = { Available: "#10b981", "On Task": "#f59e0b", Offline: "#94
 
 export default function Volunteers() {
   const [volunteers, setVolunteers] = useState([]);
+  const [camps, setCamps] = useState([]);
   const [tab, setTab] = useState("browse");
   const [skill, setSkill] = useState("All");
   const [city, setCity] = useState("All Cities");
@@ -17,19 +18,37 @@ export default function Volunteers() {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    api.get("/volunteers/users").then(res => {
-      const apiVolunteers = res.data.data.map((u, i) => ({
+    const currentUser = JSON.parse(localStorage.getItem("lifelink_user") || "null");
+    if (currentUser) {
+      setForm((prev) => ({
+        ...prev,
+        name: currentUser.name || "",
+        phone: currentUser.phone || "",
+        email: currentUser.email || "",
+        city: currentUser.city || "",
+        skills: currentUser.volunteerSkills || [],
+        availability: currentUser.volunteerAvailability || "weekends",
+        experience: currentUser.volunteerExperience || "",
+      }));
+    }
+
+    Promise.all([
+      api.get("/volunteers/users"),
+      api.get("/camps?status=scheduled"),
+    ]).then(([volunteerRes, campRes]) => {
+      const apiVolunteers = volunteerRes.data.data.map((u, i) => ({
         id: u._id,
         name: u.name,
         city: u.city || "Unknown",
-        skills: ["First Aid", "Blood Transport"],
-        rating: 4.8,
-        tasks: i * 5 + 10,
-        status: "Available",
+        skills: u.volunteerSkills?.length ? u.volunteerSkills : ["Community Support"],
+        rating: 4.5 + ((i % 5) * 0.1),
+        tasks: (u.achievements?.length || 0) + i + 3,
+        status: u.isAvailable === false ? "Offline" : "Available",
         avatar: u.name ? u.name.slice(0, 2).toUpperCase() : "U",
-        color: ["#e11d48", "#3b82f6", "#10b981", "#8b5cf6", "#f59e0b"][i % 5]
+        color: ["#e11d48", "#3b82f6", "#10b981", "#8b5cf6", "#f59e0b"][i % 5],
       }));
       setVolunteers(apiVolunteers);
+      setCamps(campRes.data.data || []);
     }).catch(console.error);
   }, []);
 
@@ -44,7 +63,11 @@ export default function Volunteers() {
       return;
     }
     try {
-      await api.post("/volunteers/join", { ...form });
+      const res = await api.post("/volunteers/join", { ...form });
+      if (res.data.data) {
+        localStorage.setItem("lifelink_user", JSON.stringify(res.data.data));
+        window.dispatchEvent(new Event("lifelink-auth-changed"));
+      }
       setSubmitted(true);
       toast.success("Welcome to the LifeLink volunteer network!");
     } catch (err) {
@@ -56,6 +79,41 @@ export default function Volunteers() {
     (skill === "All" || v.skills.includes(skill)) &&
     (city === "All Cities" || v.city === city)
   );
+
+  const joinCamp = async (campId) => {
+    try {
+      await api.post(`/camps/${campId}/join`);
+      toast.success("You joined the camp successfully");
+      setCamps((prev) =>
+        prev.map((camp) =>
+          camp._id === campId
+            ? { ...camp, volunteersJoined: [...(camp.volunteersJoined || []), { _id: "self" }] }
+            : camp
+        )
+      );
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to join camp");
+    }
+  };
+
+  const requestVolunteerHelp = async (volunteer) => {
+    const currentUser = JSON.parse(localStorage.getItem("lifelink_user") || "null");
+    if (!currentUser) {
+      toast.error("Please login first");
+      return;
+    }
+
+    try {
+      await api.post("/volunteers", {
+        city: currentUser.city || volunteer.city,
+        supportType: volunteer.skills?.[0] || "General support",
+        description: `Help requested from the volunteers page for ${volunteer.name}.`,
+      });
+      toast.success("Volunteer request created successfully");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to request volunteer help");
+    }
+  };
 
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", minHeight: "100vh", background: "#f8fafc" }}>
@@ -301,6 +359,44 @@ export default function Volunteers() {
               </div>
 
               {/* Volunteers Grid */}
+              {camps.length > 0 && (
+                <div style={{ marginBottom: 28 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                    <h3 style={{ fontSize: 22, fontWeight: 700, color: "#0f172a" }}>Upcoming Donation Camps</h3>
+                    <span style={{ fontSize: 13, color: "#64748b" }}>{camps.length} active camps</span>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 20 }}>
+                    {camps.map((camp) => (
+                      <div key={camp._id} style={{ background: "#fff", borderRadius: 24, padding: 24, border: "1px solid #e2e8f0", boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, marginBottom: 14 }}>
+                          <div>
+                            <h4 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>{camp.title}</h4>
+                            <p style={{ margin: "6px 0 0", fontSize: 13, color: "#64748b" }}>
+                              {camp.hospital?.hospitalName || "Hospital"} • {camp.city}
+                            </p>
+                          </div>
+                          <span style={{ borderRadius: 999, background: "#ede9fe", color: "#7c3aed", padding: "6px 10px", fontSize: 11, fontWeight: 700 }}>
+                            {camp.status}
+                          </span>
+                        </div>
+                        <p style={{ fontSize: 13, color: "#475569", lineHeight: 1.6 }}>{camp.description}</p>
+                        <div style={{ marginTop: 16, fontSize: 13, color: "#64748b", display: "grid", gap: 6 }}>
+                          <span>📍 {camp.location}</span>
+                          <span>📅 {new Date(camp.date).toLocaleDateString()} at {camp.time}</span>
+                          <span>👥 Joined: {camp.volunteersJoined?.length || 0}</span>
+                        </div>
+                        <button
+                          onClick={() => joinCamp(camp._id)}
+                          style={{ marginTop: 18, width: "100%", border: "none", borderRadius: 16, background: "linear-gradient(135deg, #7c3aed, #6d28d9)", color: "#fff", padding: "12px 16px", fontWeight: 700, cursor: "pointer" }}
+                        >
+                          Join This Camp
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: 24 }}>
                 {filtered.map((v, i) => (
                   <motion.div
@@ -394,7 +490,7 @@ export default function Volunteers() {
                         <motion.button
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          onClick={() => toast.success(`Request sent to ${v.name}! They'll contact you shortly.`)}
+                          onClick={() => requestVolunteerHelp(v)}
                           style={{
                             width: "100%",
                             background: "linear-gradient(135deg, #10b981, #059669)",
@@ -545,7 +641,7 @@ export default function Volunteers() {
                     }}>
                       <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>🏆 Top Volunteers</h3>
                       <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginBottom: 20 }}>This month's heroes</p>
-                      {volunteers.sort((a, b) => b.tasks - a.tasks).slice(0, 3).map((v, i) => (
+                      {[...volunteers].sort((a, b) => b.tasks - a.tasks).slice(0, 3).map((v, i) => (
                         <div key={v.id} style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
                           <span style={{ fontSize: 20, fontWeight: 800, color: ["#fbbf24", "#94a3b8", "#cd7f32"][i] }}>#{i + 1}</span>
                           <div style={{

@@ -22,7 +22,9 @@ export const createAmbulanceRequest = async (req, res, next) => {
       message: `Emergency at ${request.pickupAddress}. Patient condition: ${request.patientCondition}`,
       type: "ambulance"
     }));
-    await Notification.insertMany(notifications);
+    if (notifications.length) {
+      await Notification.insertMany(notifications);
+    }
 
     return res.status(201).json({ success: true, data: request });
   } catch (error) {
@@ -37,6 +39,10 @@ export const getAmbulanceRequests = async (req, res, next) => {
       ...(city && { city }), 
       ...(status && { status }) 
     };
+
+    if (req.user.role === "user") {
+      filter.requester = req.user._id;
+    }
     const requests = await AmbulanceRequest.find(filter)
       .populate("requester driver", "name phone city");
     return res.json({ success: true, data: requests });
@@ -47,11 +53,19 @@ export const getAmbulanceRequests = async (req, res, next) => {
 
 export const acceptAmbulanceRequest = async (req, res, next) => {
   try {
+    const existing = await AmbulanceRequest.findById(req.params.id);
+    if (!existing) {
+      return res.status(404).json({ success: false, message: "Ambulance request not found" });
+    }
+    if (existing.status !== "pending") {
+      return res.status(400).json({ success: false, message: "This ride is no longer pending" });
+    }
+
     const request = await AmbulanceRequest.findByIdAndUpdate(
       req.params.id,
       { driver: req.user._id, status: "assigned" },
       { new: true }
-    );
+    ).populate("requester driver", "name phone city");
 
     await Notification.create({
       user: request.requester,

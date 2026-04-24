@@ -37,8 +37,9 @@ export default function DonateBlood() {
       let q = "?status=open";
       if (bloodGroup) q += `&bloodGroup=${bloodGroup}`;
       if (city) q += `&city=${city}`;
+      if (urgency) q += `&emergencyLevel=${urgency}`;
       const { data: res } = await api.get(`/blood${q}`);
-      setData(res.data?.length ? res.data : demoData);
+      setData(res.data?.length ? res.data : []);
     } catch {
       let filtered = demoData;
       if (bloodGroup) filtered = filtered.filter(d => d.bloodGroup === bloodGroup);
@@ -63,18 +64,13 @@ export default function DonateBlood() {
   };
 
   const applyFilters = () => {
-    let filtered = demoData;
-    if (bloodGroup) filtered = filtered.filter(d => d.bloodGroup === bloodGroup);
-    if (city) filtered = filtered.filter(d => d.city.toLowerCase().includes(city.toLowerCase()));
-    if (urgency) filtered = filtered.filter(d => d.emergencyLevel === urgency);
-    setData(filtered);
+    fetchData();
     setShowMobileFilters(false);
-    if (!filtered.length) toast.error("No results found");
   };
 
   const resetFilters = () => {
     setCity(""); setBloodGroup(""); setUrgency("");
-    setData(demoData);
+    setTimeout(() => fetchData(), 0);
     toast.success("Filters cleared");
   };
 

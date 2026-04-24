@@ -8,6 +8,9 @@ const ambulanceRequestSchema = new mongoose.Schema(
     hospitalDestination: { type: String, required: true },
     city: { type: String, required: true, index: true },
     patientCondition: { type: String, required: true },
+    contact: { type: String, default: "" },
+    type: { type: String, default: "basic" },
+    notes: { type: String, default: "" },
     status: { type: String, enum: ["pending", "assigned", "arrived", "completed"], default: "pending" },
   },
   { timestamps: true }

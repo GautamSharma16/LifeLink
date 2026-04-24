@@ -22,7 +22,9 @@ export const createCamp = async (req, res, next) => {
       message: `${req.user.hospitalName} is organizing a camp on ${new Date(camp.date).toLocaleDateString()}.`,
       type: "camp"
     }));
-    await Notification.insertMany(notifications);
+    if (notifications.length) {
+      await Notification.insertMany(notifications);
+    }
     
     return res.status(201).json({ success: true, data: camp });
   } catch (error) {

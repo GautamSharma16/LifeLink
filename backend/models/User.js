@@ -20,12 +20,20 @@ const userSchema = new mongoose.Schema(
     },
     // Hospital Specific
     hospitalName: { type: String },
+    hospitalDescription: { type: String, default: "" },
+    hospitalRegistrationNumber: { type: String, default: "" },
+    emergencyContact: { type: String, default: "" },
+    hospitalVerified: { type: Boolean, default: false },
+    hospitalRegisteredAt: { type: Date },
     availableBeds: { type: Number, default: 0 },
     icuBeds: { type: Number, default: 0 },
     oxygenCylinders: { type: Number, default: 0 },
     // Ambulance Specific
     vehicleNumber: { type: String },
     isAvailable: { type: Boolean, default: true },
+    volunteerSkills: [{ type: String }],
+    volunteerAvailability: { type: String, default: "" },
+    volunteerExperience: { type: String, default: "" },
     
     avatar: { type: String, default: "" },
     achievements: [{ type: String }],

@@ -126,7 +126,8 @@ export default function Auth() {
       localStorage.setItem("lifelink_user", JSON.stringify(user || {}));
       window.dispatchEvent(new Event("lifelink-auth-changed"));
       toast.success("Welcome to LifeLink");
-      navigate("/dashboard");
+      if (user?.role === "hospital" && !user?.hospitalRegisteredAt) navigate("/hospital-registration");
+      else navigate("/dashboard");
     } catch (error) {
       const message = error?.response?.data?.message || "Authentication failed";
       toast.error(message);

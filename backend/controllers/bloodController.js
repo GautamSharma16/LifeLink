@@ -35,8 +35,8 @@ export const createBloodRequest = async (req, res, next) => {
 
 export const getBloodRequests = async (req, res, next) => {
   try {
-    const { city, bloodGroup, status } = req.query;
-    const filter = { ...(city && { city }), ...(bloodGroup && { bloodGroup }), ...(status && { status }) };
+    const { city, bloodGroup, status, emergencyLevel } = req.query;
+    const filter = { ...(city && { city }), ...(bloodGroup && { bloodGroup }), ...(status && { status }), ...(emergencyLevel && { emergencyLevel }) };
     const requests = await BloodRequest.find(filter).populate("requester donor", "name city bloodGroup");
     return res.json({ success: true, data: requests });
   } catch (error) {
@@ -46,11 +46,19 @@ export const getBloodRequests = async (req, res, next) => {
 
 export const acceptBloodRequest = async (req, res, next) => {
   try {
+    const existing = await BloodRequest.findById(req.params.id);
+    if (!existing) {
+      return res.status(404).json({ success: false, message: "Blood request not found" });
+    }
+    if (existing.status !== "open") {
+      return res.status(400).json({ success: false, message: "This request is no longer open" });
+    }
+
     const request = await BloodRequest.findByIdAndUpdate(
       req.params.id,
       { donor: req.user._id, status: "accepted" },
       { new: true }
-    );
+    ).populate("requester donor", "name phone city bloodGroup");
     await Notification.create({
       user: request.requester,
       title: "Blood request accepted",

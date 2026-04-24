@@ -27,7 +27,7 @@ export default function VolunteerDashboard() {
 
   const handleAcceptBlood = async (id) => {
     try {
-      const res = await api.put(`/blood/${id}/accept`);
+      const res = await api.patch(`/blood/${id}/accept`);
       if (res.data.success) {
         toast.success("Request accepted!");
         fetchData();

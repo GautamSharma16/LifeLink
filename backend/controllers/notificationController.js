@@ -21,3 +21,16 @@ export const markNotificationRead = async (req, res, next) => {
     next(error);
   }
 };
+
+export const deleteNotification = async (req, res, next) => {
+  try {
+    const notification = await Notification.findOneAndDelete({
+      _id: req.params.id,
+      user: req.user._id,
+    });
+
+    return res.json({ success: true, data: notification });
+  } catch (error) {
+    next(error);
+  }
+};
